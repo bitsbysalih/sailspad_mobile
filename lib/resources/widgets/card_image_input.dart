@@ -38,11 +38,12 @@ class _CardImageInputState extends NyState<CardImageInput> {
       aspectRatio: const CropAspectRatio(ratioX: 1.0, ratioY: 1.0),
       uiSettings: [
         AndroidUiSettings(
-            toolbarTitle: 'Resize the image',
-            toolbarColor: Colors.grey,
-            toolbarWidgetColor: Colors.white,
-            initAspectRatio: CropAspectRatioPreset.original,
-            lockAspectRatio: false),
+          toolbarTitle: 'Resize the image',
+          toolbarColor: Colors.grey,
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: true,
+        ),
         IOSUiSettings(
           title: 'Resize the image',
         ),

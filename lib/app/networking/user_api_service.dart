@@ -17,22 +17,35 @@ class UserApiService extends BaseApiService {
     );
   }
 
+  ///Sign in user
   Future<User?> signIn({required dynamic data}) async {
     return await network<User>(
       request: (request) => request.post("/auth/signin", data: data),
     );
   }
 
+  ///Request for new OTP
   Future<dynamic> resendOtp() async {
     return await network(
       request: (request) => request.get("/auth/resend-otp"),
     );
   }
 
+  ///Verify OTP
   Future<dynamic> verifyOtp({dynamic query}) async {
     return await network(
       request: (request) => request.post(
         "/auth/validate-email",
+        queryParameters: query,
+      ),
+    );
+  }
+
+  ///Check email availability
+  Future<dynamic> checkEmail({dynamic query}) async {
+    return await network(
+      request: (request) => request.post(
+        "/auth/check-email",
         queryParameters: query,
       ),
     );

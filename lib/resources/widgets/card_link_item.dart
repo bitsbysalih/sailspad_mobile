@@ -10,12 +10,12 @@ class CardLinkItem extends StatefulWidget {
     super.key,
     required this.name,
     required this.link,
-    required this.removeAt,
+    // required this.removeAt,
   });
 
   String? name;
   String? link;
-  final VoidCallback removeAt;
+  // final VoidCallback removeAt;
   @override
   State<CardLinkItem> createState() => _CardLinkItemState();
 }
@@ -88,7 +88,7 @@ class _CardLinkItemState extends NyState<CardLinkItem> {
                   ),
                 )
                 .toList(),
-            value: widget.name,
+            value: widget.name != '' ? widget.name : items[0],
             onChanged: (value) {
               setState(() {
                 widget.name = value as String;
@@ -119,7 +119,7 @@ class _CardLinkItemState extends NyState<CardLinkItem> {
           ),
         ),
         GestureDetector(
-          onTap: widget.removeAt,
+          // onTap: widget.removeAt,
           child: FaIcon(
             FontAwesomeIcons.solidCircleXmark,
             size: 20,

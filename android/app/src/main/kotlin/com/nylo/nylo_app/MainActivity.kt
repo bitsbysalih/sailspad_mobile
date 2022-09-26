@@ -1,4 +1,4 @@
-package com.nylo.nylo_app
+package com.example.sailspad
 
 import io.flutter.embedding.android.FlutterActivity
 

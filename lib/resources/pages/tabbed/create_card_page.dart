@@ -37,13 +37,14 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
   String token = '';
 
   List cardLinks = [
-    {"name": "twitter", "link": "https://twitter.com/"},
+    {"name": "", "link": ""},
   ];
 
   bool? _isLoadingMarkers = false;
   bool _isLoading = false;
 
   List loadedMarkers = [];
+
   Map _cardData = {
     "name": "",
     "title": "",
@@ -135,9 +136,9 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
   }
 
   void createCard() async {
-    String cardImagefileName = _cardImage!.path.split('/').last;
-    String logoImagefileName = _logoImage!.path.split('/').last;
-    String backgroundImagefileName = _backgroundImage!.path.split('/').last;
+    String? cardImagefileName = _cardImage?.path.split('/').last;
+    String? logoImagefileName = _logoImage?.path.split('/').last;
+    String? backgroundImagefileName = _backgroundImage?.path.split('/').last;
 
     FormData formData = new FormData.fromMap({
       "name": _cardData['name'],
@@ -148,19 +149,35 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
       "shortName": _cardData['shortName'],
       "activeStatus": _cardData['activeStatus'],
       "marker": _cardData['marker'],
-      "cardImage": await MultipartFile.fromFile(
-        _cardImage!.path,
-        filename: cardImagefileName,
-      ),
-      "logoImage": await MultipartFile.fromFile(
-        _logoImage!.path,
-        filename: logoImagefileName,
-      ),
-      "backgroundImage": await MultipartFile.fromFile(
-        _backgroundImage!.path,
-        filename: backgroundImagefileName,
-      ),
+      "cardImage": cardImagefileName != null
+          ? await MultipartFile.fromFile(
+              _cardImage!.path,
+              filename: cardImagefileName,
+            )
+          : '',
+      "logoImage": logoImagefileName != null
+          ? await MultipartFile.fromFile(
+              _logoImage!.path,
+              filename: logoImagefileName,
+            )
+          : '',
+      "backgroundImage": backgroundImagefileName != null
+          ? await MultipartFile.fromFile(
+              _backgroundImage!.path,
+              filename: backgroundImagefileName,
+            )
+          : '',
     });
+
+    if (cardImagefileName == null) {
+      showToastNotification(
+        context,
+        title: 'Error',
+        description: 'Main image cannot be empty',
+        style: ToastNotificationStyleType.DANGER,
+      );
+      return;
+    }
     setState(() {
       _isLoading = true;
     });
@@ -424,14 +441,8 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                       child: ListView.builder(
                                         itemBuilder: (ctx, i) {
                                           return CardLinkItem(
-                                            name: _cardData['links'][i]['name'],
-                                            link: _cardData['links'][i]['link'],
-                                            removeAt: () {
-                                              setState(() {
-                                                _cardData['links'].removeAt(
-                                                    _cardData['links'][i]);
-                                              });
-                                            },
+                                            name: cardLinks[i]['name'],
+                                            link: cardLinks[i]['link'],
                                           );
                                         },
                                         itemCount: cardLinks.length,
@@ -441,15 +452,13 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                       width: 65,
                                       height: 35,
                                       onPressed: () {
+                                        Map newLink = {"name": "", "link": ""};
+                                        final List copiedLinks = [...cardLinks];
                                         setState(() {
-                                          cardLinks.add(
-                                            {
-                                              "name": "twitter",
-                                              "link": "",
-                                            },
-                                          );
+                                          // copiedLinks.add(newLink);
+                                          // cardLinks = copiedLinks;
+                                          print(copiedLinks);
                                         });
-                                        print(cardLinks);
                                       },
                                       child: Row(
                                         mainAxisAlignment:
@@ -643,9 +652,9 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                           },
                           child: _isLoading
                               ? SizedBox(
-                                  child: CircularProgressIndicator(
-                                    color: Colors.blue,
-                                    strokeWidth: 2,
+                                  child: SpinKitWave(
+                                    color: Colors.black,
+                                    size: 20.0,
                                   ),
                                   height: 20.0,
                                   width: 20.0,

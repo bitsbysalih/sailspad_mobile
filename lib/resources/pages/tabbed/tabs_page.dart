@@ -1,9 +1,11 @@
+import 'dart:io';
+
 import 'package:dot_navigation_bar/dot_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:sailspad/app/networking/user_api_service.dart';
-import 'package:sailspad/resources/pages/analytics_page.dart';
+import 'package:sailspad/resources/pages/tabbed/analytics_page.dart';
 
 import '../../../app/controllers/controller.dart';
 import '../../../bootstrap/helpers.dart';
@@ -188,7 +190,8 @@ class _TabsPageState extends NyState<TabsPage> {
         borderRadius: 50,
         enableFloatingNavBar: true,
         itemPadding: EdgeInsets.only(top: 2, bottom: 2),
-        marginR: EdgeInsets.only(right: 25, left: 25),
+        marginR: EdgeInsets.only(
+            right: 25, left: 25, bottom: Platform.isAndroid ? 45 : 0),
         paddingR: EdgeInsets.only(right: 25, left: 25, top: 15),
         enablePaddingAnimation: false,
         dotIndicatorColor: Colors.transparent,

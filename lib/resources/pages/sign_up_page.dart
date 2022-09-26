@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io' show File;
 
 import 'package:flutter/material.dart';
@@ -24,12 +25,15 @@ class SignUpPage extends NyStatefulWidget {
 }
 
 class _SignUpPageState extends NyState<SignUpPage> {
+  final _signUpFormKey = GlobalKey<FormState>();
+
   int signUpStep = 1;
   bool _isLoading = false;
   File? _profilePhoto;
   final userContactLinks = [
     {"name": "twitter", "link": "https://twitter.com/"},
   ];
+  Timer? _debounce;
 
   Map _signUpData = {
     'firstName': '',
@@ -50,6 +54,7 @@ class _SignUpPageState extends NyState<SignUpPage> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -190,97 +195,100 @@ class _SignUpPageState extends NyState<SignUpPage> {
 
   Widget initialSignUpView() {
     return Container(
-      child: Column(
-        children: [
-          Text(
-            'Tell us about you!',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w300,
+      child: Form(
+        key: _signUpFormKey,
+        child: Column(
+          children: [
+            Text(
+              'Tell us about you!',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w300,
+              ),
             ),
-          ),
-          SizedBox(
-            height: 30,
-          ),
-          ProfilePhotoInput(
-            onSelectImage: _selectProfileImage,
-          ),
-          Form(
-            child: Column(
-              children: [
-                AuthFormField(
-                  label: 'First Name',
-                  textInputType: TextInputType.name,
-                  onChanged: (value) {
-                    _signUpData['firstName'] = value;
-                  },
-                ),
-                AuthFormField(
-                  label: 'Last Name',
-                  textInputType: TextInputType.name,
-                  onChanged: (value) {
-                    _signUpData['lastName'] = value;
-                  },
-                ),
-                AuthFormField(
-                  label: 'Job Title',
-                  textInputType: TextInputType.text,
-                  onChanged: (value) {
-                    _signUpData['jobTitle'] = value;
-                  },
-                ),
-                AuthFormField(
-                  label: 'Email',
-                  textInputType: TextInputType.emailAddress,
-                  onChanged: (value) {
-                    _signUpData['email'] = value;
-                  },
-                ),
-                AuthFormField(
-                  label: 'Password',
-                  textInputType: TextInputType.visiblePassword,
-                  onChanged: (value) {
-                    _signUpData['password'] = value;
-                  },
-                  obscureText: true,
-                ),
-                AuthFormField(
-                  label: 'Confirm Password',
-                  textInputType: TextInputType.visiblePassword,
-                  onChanged: (value) {
-                    _signUpData['confirmPassword'] = value;
-                  },
-                  obscureText: true,
-                ),
-              ],
+            SizedBox(
+              height: 30,
             ),
-          ),
-          RoundedButton(
-            child: _isLoading
-                ? SizedBox(
-                    child: CircularProgressIndicator(
-                      color: Colors.blue,
-                      strokeWidth: 2,
-                    ),
-                    height: 20.0,
-                    width: 20.0,
-                  )
-                : Text(
-                    'Next',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 17,
-                    ),
+            ProfilePhotoInput(
+              onSelectImage: _selectProfileImage,
+            ),
+            Form(
+              child: Column(
+                children: [
+                  AuthFormField(
+                    label: 'First Name',
+                    textInputType: TextInputType.name,
+                    onChanged: (value) {
+                      _signUpData['firstName'] = value;
+                    },
                   ),
-            onPressed: initialSignUp,
-          ),
-          TextButton(
-            onPressed: () {
-              routeTo('/sign-in-page');
-            },
-            child: Text('Already have an account?'),
-          )
-        ],
+                  AuthFormField(
+                    label: 'Last Name',
+                    textInputType: TextInputType.name,
+                    onChanged: (value) {
+                      _signUpData['lastName'] = value;
+                    },
+                  ),
+                  AuthFormField(
+                    label: 'Job Title',
+                    textInputType: TextInputType.text,
+                    onChanged: (value) {
+                      _signUpData['jobTitle'] = value;
+                    },
+                  ),
+                  AuthFormField(
+                    label: 'Email',
+                    textInputType: TextInputType.emailAddress,
+                    onChanged: (value) {
+                      _signUpData['email'] = value;
+                    },
+                  ),
+                  AuthFormField(
+                    label: 'Password',
+                    textInputType: TextInputType.visiblePassword,
+                    onChanged: (value) {
+                      _signUpData['password'] = value;
+                    },
+                    obscureText: true,
+                  ),
+                  AuthFormField(
+                    label: 'Confirm Password',
+                    textInputType: TextInputType.visiblePassword,
+                    onChanged: (value) {
+                      _signUpData['confirmPassword'] = value;
+                    },
+                    obscureText: true,
+                  ),
+                ],
+              ),
+            ),
+            RoundedButton(
+              child: _isLoading
+                  ? SizedBox(
+                      child: CircularProgressIndicator(
+                        color: Colors.blue,
+                        strokeWidth: 2,
+                      ),
+                      height: 20.0,
+                      width: 20.0,
+                    )
+                  : Text(
+                      'Next',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 17,
+                      ),
+                    ),
+              onPressed: initialSignUp,
+            ),
+            TextButton(
+              onPressed: () {
+                routeTo('/sign-in-page');
+              },
+              child: Text('Already have an account?'),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -364,13 +372,13 @@ class _SignUpPageState extends NyState<SignUpPage> {
                       return CardLinkItem(
                         name: _signUpData['links'][i]['name'],
                         link: _signUpData['links'][i]['link'],
-                        removeAt: () {
-                          setState(
-                            () {
-                              _signUpData['links'].removeAt(i);
-                            },
-                          );
-                        },
+                        // removeAt: () {
+                        //   setState(
+                        //     () {
+                        //       _signUpData['links'].removeAt(i);
+                        //     },
+                        //   );
+                        // },
                       );
                     },
                     itemCount: _signUpData['links'].length,
