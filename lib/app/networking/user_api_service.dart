@@ -60,6 +60,7 @@ class UserApiService extends BaseApiService {
     );
   }
 
+  ///Get user details
   Future<dynamic> getuserDetails() async {
     return await network(
       request: (request) => request.get("/user/"),
@@ -73,18 +74,17 @@ class UserApiService extends BaseApiService {
     );
   }
 
-  /// Create a User
-  Future<User?> create({required dynamic data}) async {
+  ///Update user passowrd
+  Future<User?> editPassword({dynamic data}) async {
     return await network<User>(
-      request: (request) => request.post("/endpoint-path", data: data),
+      request: (request) => request.put("/user/edit-password", data: data),
     );
   }
 
   /// Update a User
-  Future<User?> update({dynamic query}) async {
+  Future<User?> update({dynamic data}) async {
     return await network<User>(
-      request: (request) =>
-          request.put("/endpoint-path", queryParameters: query),
+      request: (request) => request.put("/user", data: data),
     );
   }
 

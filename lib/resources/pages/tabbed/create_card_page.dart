@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -13,7 +14,6 @@ import '../../../app/models/ar_card.dart';
 import '../../../bootstrap/helpers.dart';
 import '../../widgets/auth_form_field.dart';
 import '../../widgets/card_image_input.dart';
-import '../../widgets/card_link_item.dart';
 import '../../widgets/profile_photo_input.dart';
 import '../../widgets/rounded_button.dart';
 
@@ -37,7 +37,7 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
   String token = '';
 
   List cardLinks = [
-    {"name": "", "link": ""},
+    {"name": "instagram", "link": ""},
   ];
 
   bool? _isLoadingMarkers = false;
@@ -53,26 +53,53 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
     "shortName": "",
     "activeStatus": true,
     "links": [],
-    "cardImage": File,
-    "logoImage": File,
-    "backgroundImage": File,
+    "cardImage": '',
+    "logoImage": '',
+    "backgroundImage": '',
     "marker": {
-      "uniqueId": "",
-      "markerFile": "",
-      "markerImage": "",
+      "uniqueId": '',
+      "markerFile": '',
+      "markerImage": '',
     },
   };
+
+  final List<String> items = [
+    'instagram',
+    'facebook',
+    'linkedin',
+    'twitter',
+    'website',
+    'github',
+  ];
+
+  IconData iconSelector(String iconName) {
+    if (iconName == 'instagram') {
+      return FontAwesomeIcons.instagram;
+    } else if (iconName == 'twitter') {
+      return FontAwesomeIcons.twitter;
+    } else if (iconName == 'facebook') {
+      return FontAwesomeIcons.facebook;
+    } else if (iconName == 'linkedin') {
+      return FontAwesomeIcons.linkedin;
+    } else if (iconName == 'website') {
+      return FontAwesomeIcons.globe;
+    } else if (iconName == 'github') {
+      return FontAwesomeIcons.github;
+    }
+    return FontAwesomeIcons.a;
+  }
 
   @override
   init() async {
     token = await NyStorage.read("user_token");
+    await loadMarkers();
+
     _cardData['links'] = cardLinks;
     await api<ArCardApiService>(
       (request) {
         cardId = request.returnCardId().toString();
       },
     );
-    loadMarkers();
 
     if (cardId!.isNotEmpty) {
       editMode = true;
@@ -93,7 +120,7 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
     super.dispose();
   }
 
-  void loadMarkers() async {
+  Future<void> loadMarkers() async {
     final response = await api<ArCardApiService>(
       (request) => request.listMarkers(),
     );
@@ -120,12 +147,13 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
           "about": response.about,
           "shortName": response.shortName,
           "links": response.links,
+          "activeStatus": response.activeStatus,
           "logoImage": response.logoImage,
           'backgroundImage': response.backgroundImage,
           "marker": {
-            "uniqueId": response.marker!['uniqueId'],
-            "markerFile": response.marker!['markerFile'],
-            "markerImage": response.marker!['markerImage'],
+            "uniqueId": response.marker?['uniqueId'],
+            "markerFile": response.marker?['markerFile'],
+            "markerImage": response.marker?['markerImage'],
           }
         };
       });
@@ -225,6 +253,7 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
             )
           : '',
     });
+
     setState(() {
       _isLoading = true;
     });
@@ -315,7 +344,7 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                           ),
                           margin: EdgeInsets.only(top: 30),
                           padding: EdgeInsets.symmetric(horizontal: 10),
-                          height: 1180,
+                          height: 1200,
                           width: double.infinity,
                           child: Column(
                             children: [
@@ -438,26 +467,177 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                           ),
                                         ),
                                       ),
-                                      child: ListView.builder(
-                                        itemBuilder: (ctx, i) {
-                                          return CardLinkItem(
-                                            name: cardLinks[i]['name'],
-                                            link: cardLinks[i]['link'],
+                                      child: ListView(
+                                        children: (_cardData['links'] as List)
+                                            .map((e) {
+                                          return Container(
+                                            margin: EdgeInsets.symmetric(
+                                                vertical: 5),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                DropdownButtonHideUnderline(
+                                                  child: DropdownButton2(
+                                                    isExpanded: true,
+                                                    hint: Row(
+                                                      children: const [
+                                                        SizedBox(
+                                                          width: 4,
+                                                        ),
+                                                        Expanded(
+                                                          child: Text(
+                                                            'Link...',
+                                                            style: TextStyle(
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    items: items
+                                                        .map(
+                                                          (item) =>
+                                                              DropdownMenuItem<
+                                                                  String>(
+                                                            value: item,
+                                                            child: Row(
+                                                              children: [
+                                                                FaIcon(
+                                                                  iconSelector(
+                                                                      item),
+                                                                ),
+                                                                SizedBox(
+                                                                  width: 8,
+                                                                ),
+                                                                Text(
+                                                                  item,
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize:
+                                                                        10,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    // color: Colors.white,
+                                                                  ),
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        )
+                                                        .toList(),
+                                                    value: e['name'],
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        e['name'] =
+                                                            value as String;
+                                                      });
+                                                    },
+                                                    icon: const FaIcon(
+                                                      FontAwesomeIcons
+                                                          .chevronDown,
+                                                    ),
+                                                    iconSize: 10,
+                                                    buttonHeight: 35,
+                                                    buttonWidth: 120,
+                                                    buttonPadding:
+                                                        const EdgeInsets.only(
+                                                            left: 14,
+                                                            right: 14),
+                                                    buttonDecoration:
+                                                        BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5),
+                                                    ),
+                                                    itemHeight: 40,
+                                                    itemPadding:
+                                                        const EdgeInsets.only(
+                                                            left: 14,
+                                                            right: 14),
+                                                    dropdownMaxHeight: 200,
+                                                    dropdownWidth: 200,
+                                                    dropdownPadding: null,
+                                                    dropdownDecoration:
+                                                        BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
+                                                    ),
+                                                    dropdownElevation: 8,
+                                                    scrollbarRadius:
+                                                        const Radius.circular(
+                                                            40),
+                                                    scrollbarThickness: 6,
+                                                    scrollbarAlwaysShow: true,
+                                                    offset:
+                                                        const Offset(-20, 0),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: mediaQuery.size.width *
+                                                      0.4,
+                                                  height: 55,
+                                                  child: AuthFormField(
+                                                    padding: 5,
+                                                    textInputType:
+                                                        TextInputType.url,
+                                                    initialValue:
+                                                        e['link'] as String,
+                                                    label: 'Add your link here',
+                                                    validator: (value) {
+                                                      if (value!.isEmpty) {
+                                                        return 'Please provide a link.';
+                                                      }
+                                                      return '';
+                                                    },
+                                                    onChanged: (value) {
+                                                      e['link'] = value;
+                                                    },
+                                                  ),
+                                                ),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      _cardData['links'] as List
+                                                        ..removeWhere((item) =>
+                                                            item['name'] ==
+                                                            e['name']);
+                                                    });
+                                                  },
+                                                  child: FaIcon(
+                                                    FontAwesomeIcons
+                                                        .circleXmark,
+                                                    size: 16,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
                                           );
-                                        },
-                                        itemCount: cardLinks.length,
+                                        }).toList(),
                                       ),
                                     ),
                                     RoundedButton(
                                       width: 65,
                                       height: 35,
                                       onPressed: () {
-                                        Map newLink = {"name": "", "link": ""};
-                                        final List copiedLinks = [...cardLinks];
                                         setState(() {
-                                          // copiedLinks.add(newLink);
-                                          // cardLinks = copiedLinks;
-                                          print(copiedLinks);
+                                          _cardData['links'].add({
+                                            'name': 'instagram',
+                                            'link': ''
+                                          });
                                         });
                                       },
                                       child: Row(
@@ -489,17 +669,19 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                     CardImageInput(
                                       buttonLabel: 'Upload Logo',
                                       onSelectImage: _selectLogoImage,
-                                      profilePhoto: editMode
+                                      profilePhoto: _cardData['logoImage'] !=
+                                              null
                                           ? _cardData['logoImage'].toString()
                                           : '',
                                     ),
                                     CardImageInput(
                                       buttonLabel: 'Card Background',
                                       onSelectImage: _selectBackgroundImage,
-                                      profilePhoto: editMode
-                                          ? _cardData['backgroundImage']
-                                              .toString()
-                                          : '',
+                                      profilePhoto:
+                                          _cardData['backgroundImage'] != null
+                                              ? _cardData['backgroundImage']
+                                                  .toString()
+                                              : '',
                                     ),
                                   ],
                                 ),
@@ -528,15 +710,18 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                                   BorderRadius.circular(10),
                                             ),
                                             child: _cardData['marker']
-                                                            ['markerImage']
-                                                        as String ==
-                                                    ""
+                                                            ['markerImage'] ==
+                                                        null ||
+                                                    _cardData['marker']
+                                                            ['markerImage'] ==
+                                                        ''
                                                 ? Image.asset(
-                                                    'public/assets/images/sample_marker.jpeg',
+                                                    'public/assets/images/placeholder.png',
                                                   )
                                                 : Image.network(
                                                     _cardData['marker']
-                                                        ['markerImage'],
+                                                            ['markerImage']
+                                                        .toString(),
                                                   ),
                                           ),
                                           Container(
@@ -608,29 +793,59 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                     SizedBox(
                                       height: 30,
                                     ),
-                                    RoundedButton(
-                                      width: mediaQuery.size.width * 0.55,
-                                      onPressed: () {
-                                        _loadBottomSheetWebView(context, token);
-                                      },
+                                    SizedBox(
+                                      width: mediaQuery.size.width * 0.8,
                                       child: Row(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          FaIcon(
-                                            FontAwesomeIcons.plus,
-                                            size: 18,
+                                          RoundedButton(
+                                            height: 30,
+                                            width: mediaQuery.size.width * 0.55,
+                                            onPressed: () {
+                                              _loadBottomSheetWebView(
+                                                  context, token);
+                                            },
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceAround,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                FaIcon(
+                                                  FontAwesomeIcons.plus,
+                                                  size: 18,
+                                                ),
+                                                Text(
+                                                  'Upload new Business Card',
+                                                  style:
+                                                      TextStyle(fontSize: 12),
+                                                ),
+                                              ],
+                                            ),
+                                            margin: EdgeInsets.only(top: 40),
                                           ),
-                                          Text(
-                                            'Upload new Business Card',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
+                                          Column(
+                                            children: [
+                                              Switch(
+                                                value:
+                                                    _cardData['activeStatus'],
+                                                onChanged: (value) {
+                                                  setState(
+                                                    () {
+                                                      _cardData[
+                                                              'activeStatus'] =
+                                                          value;
+                                                    },
+                                                  );
+                                                },
+                                              ),
+                                              // Text('Active')
+                                            ],
+                                          )
                                         ],
                                       ),
-                                      margin: EdgeInsets.only(top: 40),
-                                    ),
+                                    )
                                   ],
                                 ),
                               ),
@@ -652,8 +867,8 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                           },
                           child: _isLoading
                               ? SizedBox(
-                                  child: SpinKitWave(
-                                    color: Colors.black,
+                                  child: SpinKitChasingDots(
+                                    color: Colors.grey,
                                     size: 20.0,
                                   ),
                                   height: 20.0,

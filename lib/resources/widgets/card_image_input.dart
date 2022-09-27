@@ -35,7 +35,9 @@ class _CardImageInputState extends NyState<CardImageInput> {
   Future<CroppedFile?> cropSelectedImage(String filePath) async {
     return await ImageCropper().cropImage(
       sourcePath: filePath,
-      aspectRatio: const CropAspectRatio(ratioX: 1.0, ratioY: 1.0),
+      aspectRatio: CropAspectRatio(ratioX: 1.0, ratioY: 1.0),
+      compressFormat: ImageCompressFormat.png,
+      aspectRatioPresets: [CropAspectRatioPreset.square],
       uiSettings: [
         AndroidUiSettings(
           toolbarTitle: 'Resize the image',
@@ -78,6 +80,7 @@ class _CardImageInputState extends NyState<CardImageInput> {
         SizedBox(
           width: mediaQuery.size.width * 0.35,
           child: RoundedButton(
+            height: 30,
             onPressed: () async {
               await _getFromGallery().then((pickedFile) async {
                 if (pickedFile == null) return;

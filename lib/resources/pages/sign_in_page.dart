@@ -44,7 +44,7 @@ class _SignInPageState extends NyState<SignInPage> {
     );
     if (response != null) {
       await NyStorage.store('user_token', response.accessToken);
-      routeTo('/tabs-page', navigationType: NavigationType.pushReplace);
+      routeTo('/tabs-page', navigationType: NavigationType.popAndPushNamed);
     }
     setState(() {
       _isLoading = false;

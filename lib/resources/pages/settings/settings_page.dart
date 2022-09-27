@@ -18,6 +18,7 @@ class _SettingsPageState extends NyState<SettingsPage> {
   Map _userDetails = {
     "firstName": "",
     "lastName": "",
+    'email': '',
     'profilePhoto': '',
     "jobTitle": '',
     "cardSlots": int,
@@ -135,7 +136,13 @@ class _SettingsPageState extends NyState<SettingsPage> {
                   label: 'Security',
                   icon: FontAwesomeIcons.unlockKeyhole,
                   onPressed: () {
-                    routeTo('/settings-page/security');
+                    routeTo(
+                      '/settings-page/security',
+                      data: {
+                        'email': _userDetails['email'],
+                        "cardSlots": _userDetails['cardSlots'],
+                      },
+                    );
                   },
                 ),
                 SettingsButton(
@@ -143,7 +150,10 @@ class _SettingsPageState extends NyState<SettingsPage> {
                   icon: FontAwesomeIcons.arrowRightFromBracket,
                   onPressed: () {
                     NyStorage.delete('user_token');
-                    routeTo('/sign-in-page');
+                    routeTo(
+                      '/sign-in-page',
+                      navigationType: NavigationType.popAndPushNamed,
+                    );
                   },
                 ),
               ],

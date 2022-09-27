@@ -47,11 +47,12 @@ class _CardListItemState extends NyState<CardListItem> {
     return showMaterialModalBottomSheet(
       context: context,
       builder: (context) => SizedBox(
-        height: 800,
+        height: 750,
         child: WebView(
           initialUrl:
               'https://sailspad-card-viewer-bitsbysalih.vercel.app/cards/${widget.id}/view',
           javascriptMode: JavascriptMode.unrestricted,
+          allowsInlineMediaPlayback: true,
         ),
       ),
       isDismissible: true,
@@ -63,7 +64,7 @@ class _CardListItemState extends NyState<CardListItem> {
     return showMaterialModalBottomSheet(
       context: context,
       builder: (context) => SizedBox(
-        height: 800,
+        height: 750,
         child: WebView(
           initialUrl:
               'https://sailspad-card-viewer-bitsbysalih.vercel.app/cards/${widget.id}/qrcode',
@@ -164,23 +165,15 @@ class _CardListItemState extends NyState<CardListItem> {
                 ),
                 CustomIconButton(
                   label: 'View AR',
-                  onTap: () async {
-                    await launchUrl(
-                      Uri.parse(
-                          'https://sailspad-card-viewer-bitsbysalih.vercel.app/cards/${widget.id}/view'),
-                      mode: LaunchMode.inAppWebView,
-                    );
+                  onTap: () {
+                    _showARBottomSheet(context);
                   },
                   icon: FontAwesomeIcons.solidEye,
                 ),
                 CustomIconButton(
                   label: 'Share',
-                  onTap: () async {
-                    await launchUrl(
-                      Uri.parse(
-                          'https://sailspad-card-viewer-bitsbysalih.vercel.app/cards/${widget.id}/qrcode'),
-                      mode: LaunchMode.inAppWebView,
-                    );
+                  onTap: () {
+                    _showQRBottomSheet(context);
                   },
                   icon: SailspadIcons.sailspad_share,
                 ),

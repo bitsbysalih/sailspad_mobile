@@ -93,7 +93,11 @@ class _OnboardingPageState extends NyState<OnboardingPage> {
                                 ),
                               ),
                               onPressed: () {
-                                routeTo('/sign-up-page');
+                                routeTo(
+                                  '/sign-up-page',
+                                  navigationType:
+                                      NavigationType.popAndPushNamed,
+                                );
                               },
                               child: Text(
                                 'GET STARTED',
@@ -109,7 +113,10 @@ class _OnboardingPageState extends NyState<OnboardingPage> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              routeTo('/sign-in-page');
+                              routeTo(
+                                '/sign-in-page',
+                                navigationType: NavigationType.popAndPushNamed,
+                              );
                             },
                             child: Text(
                               'Login',

@@ -12,6 +12,7 @@ class ArCard {
   String? backgroundImage;
   List? links;
   Map? marker;
+  bool? activeStatus;
 
   ArCard({
     this.id,
@@ -26,6 +27,7 @@ class ArCard {
     this.cardImage,
     this.shortName,
     this.uniqueId,
+    this.activeStatus,
   });
 
   ArCard.fromJson(dynamic data) {
@@ -41,6 +43,7 @@ class ArCard {
     backgroundImage = data['backgroundImage'];
     links = data['links'];
     marker = data['marker'];
+    activeStatus = data['activeStatus'];
   }
 
   toJson() => {
@@ -56,5 +59,6 @@ class ArCard {
         'backgroundImage': backgroundImage,
         'links': links,
         'marker': marker,
+        'activeStatus': activeStatus,
       };
 }

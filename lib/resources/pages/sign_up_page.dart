@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io' show File;
 
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nylo_framework/nylo_framework.dart';
@@ -46,6 +47,32 @@ class _SignUpPageState extends NyState<SignUpPage> {
     'otpToken': '',
     "links": [],
   };
+
+  final List<String> items = [
+    'instagram',
+    'facebook',
+    'linkedin',
+    'twitter',
+    'website',
+    'github',
+  ];
+
+  IconData iconSelector(String iconName) {
+    if (iconName == 'instagram') {
+      return FontAwesomeIcons.instagram;
+    } else if (iconName == 'twitter') {
+      return FontAwesomeIcons.twitter;
+    } else if (iconName == 'facebook') {
+      return FontAwesomeIcons.facebook;
+    } else if (iconName == 'linkedin') {
+      return FontAwesomeIcons.linkedin;
+    } else if (iconName == 'website') {
+      return FontAwesomeIcons.globe;
+    } else if (iconName == 'github') {
+      return FontAwesomeIcons.github;
+    }
+    return FontAwesomeIcons.a;
+  }
 
   @override
   init() async {
@@ -163,15 +190,15 @@ class _SignUpPageState extends NyState<SignUpPage> {
         description: 'Error adding links',
       );
     }
-    createCardFromSignUp();
 
     setState(() {
       _isLoading = false;
     });
-    routeTo('/tabs-page');
+    await createCardFromSignUp();
+    routeTo('/tabs-page', navigationType: NavigationType.popAndPushNamed);
   }
 
-  void createCardFromSignUp() async {
+  Future<void> createCardFromSignUp() async {
     String cardImagefileName = _profilePhoto!.path.split('/').last;
     print(_signUpData);
     FormData formData = new FormData.fromMap({
@@ -367,21 +394,128 @@ class _SignUpPageState extends NyState<SignUpPage> {
                 Container(
                   margin: EdgeInsets.only(bottom: 20, top: 30),
                   height: 200,
-                  child: ListView.builder(
-                    itemBuilder: (ctx, i) {
-                      return CardLinkItem(
-                        name: _signUpData['links'][i]['name'],
-                        link: _signUpData['links'][i]['link'],
-                        // removeAt: () {
-                        //   setState(
-                        //     () {
-                        //       _signUpData['links'].removeAt(i);
-                        //     },
-                        //   );
-                        // },
+                  child: ListView(
+                    children: (_signUpData['links'] as List).map((e) {
+                      return Container(
+                        margin: EdgeInsets.symmetric(vertical: 5),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            DropdownButtonHideUnderline(
+                              child: DropdownButton2(
+                                isExpanded: true,
+                                hint: Row(
+                                  children: const [
+                                    SizedBox(
+                                      width: 4,
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        'Link...',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                items: items
+                                    .map(
+                                      (item) => DropdownMenuItem<String>(
+                                        value: item,
+                                        child: Row(
+                                          children: [
+                                            FaIcon(
+                                              iconSelector(item),
+                                            ),
+                                            SizedBox(
+                                              width: 8,
+                                            ),
+                                            Text(
+                                              item,
+                                              style: const TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                                // color: Colors.white,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                                value: e['name'],
+                                onChanged: (value) {
+                                  setState(() {
+                                    e['name'] = value as String;
+                                  });
+                                },
+                                icon: const FaIcon(
+                                  FontAwesomeIcons.chevronDown,
+                                ),
+                                iconSize: 10,
+                                buttonHeight: 35,
+                                buttonWidth: 120,
+                                buttonPadding:
+                                    const EdgeInsets.only(left: 14, right: 14),
+                                buttonDecoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                itemHeight: 40,
+                                itemPadding:
+                                    const EdgeInsets.only(left: 14, right: 14),
+                                dropdownMaxHeight: 200,
+                                dropdownWidth: 200,
+                                dropdownPadding: null,
+                                dropdownDecoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                dropdownElevation: 8,
+                                scrollbarRadius: const Radius.circular(40),
+                                scrollbarThickness: 6,
+                                scrollbarAlwaysShow: true,
+                                offset: const Offset(-20, 0),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 150,
+                              height: 55,
+                              child: AuthFormField(
+                                padding: 5,
+                                fontSize: 14,
+                                textInputType: TextInputType.url,
+                                initialValue: e['link'] as String,
+                                label: 'Add your link here',
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Please provide a link.';
+                                  }
+                                  return '';
+                                },
+                                onChanged: (value) {
+                                  e['link'] = value;
+                                },
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                // final linkIndex = cardData['links']
+                                //     .indexWhere(
+                                //         (link) => link.index == e.index);
+                              },
+                              child: FaIcon(
+                                FontAwesomeIcons.circleXmark,
+                                size: 16,
+                              ),
+                            )
+                          ],
+                        ),
                       );
-                    },
-                    itemCount: _signUpData['links'].length,
+                    }).toList(),
                   ),
                 ),
                 RoundedButton(
