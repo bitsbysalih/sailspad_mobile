@@ -48,8 +48,8 @@ class ArCardApiService extends BaseApiService {
   }
 
   /// Delete a ArCard
-  Future<bool?> delete({required String id}) async {
-    return await network<bool>(
+  Future<ArCard?> delete({required String id}) async {
+    return await network<ArCard>(
       request: (request) => request.delete("/card/$id/delete"),
     );
   }

@@ -79,10 +79,6 @@ class _HomePageState extends NyState<HomePage> {
         ),
         height: mediaQuery.size.height * 0.735,
         width: mediaQuery.size.width,
-        padding: EdgeInsets.only(
-          left: 30,
-          right: 30,
-        ),
         child: _isLoading
             ? SizedBox(
                 child: SpinKitDualRing(
@@ -97,19 +93,32 @@ class _HomePageState extends NyState<HomePage> {
                     "You don't have any cards yet",
                     textAlign: TextAlign.center,
                   )
-                : ListView.builder(
-                    itemBuilder: (ctx, i) {
-                      return CardListItem(
-                        switchToEdit: widget.switchToEdit,
-                        deleteCard: deleteCard,
-                        id: loadedCards[i]!.id,
-                        name: loadedCards[i]!.name,
-                        title: loadedCards[i]!.title,
-                        uniqueId: loadedCards[i]!.uniqueId,
-                        cardImage: loadedCards[i]!.cardImage,
-                      );
-                    },
-                    itemCount: loadedCards.length,
+                : ScrollConfiguration(
+                    behavior: ScrollBehavior(),
+                    child: GlowingOverscrollIndicator(
+                      axisDirection: AxisDirection.down,
+                      color: Colors.grey,
+                      child: ListView.builder(
+                        itemBuilder: (ctx, i) {
+                          return Padding(
+                            padding: EdgeInsets.only(
+                              left: 30,
+                              right: 30,
+                            ),
+                            child: CardListItem(
+                              switchToEdit: widget.switchToEdit,
+                              deleteCard: deleteCard,
+                              id: loadedCards[i]!.id,
+                              name: loadedCards[i]!.name,
+                              title: loadedCards[i]!.title,
+                              uniqueId: loadedCards[i]!.uniqueId,
+                              cardImage: loadedCards[i]!.cardImage,
+                            ),
+                          );
+                        },
+                        itemCount: loadedCards.length,
+                      ),
+                    ),
                   ),
       ),
     );

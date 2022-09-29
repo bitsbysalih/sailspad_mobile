@@ -57,6 +57,7 @@ class _CardListItemState extends NyState<CardListItem> {
         useHybridComposition: true,
         allowFileAccess: true,
         allowContentAccess: true,
+        hardwareAcceleration: true,
       ),
       ios: IOSInAppWebViewOptions(
         allowsInlineMediaPlayback: true,
@@ -132,7 +133,6 @@ class _CardListItemState extends NyState<CardListItem> {
                       width: 2,
                       color: Color(0xFFE3E3E3),
                     ),
-                    color: Colors.red,
                     image: DecorationImage(
                       image: NetworkImage(
                         widget.cardImage!,
