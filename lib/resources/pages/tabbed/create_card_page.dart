@@ -2,12 +2,12 @@ import 'dart:io';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:sailspad/app/networking/ar_card_api_service.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../app/controllers/controller.dart';
 import '../../../app/models/ar_card.dart';
@@ -91,7 +91,6 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
 
   @override
   init() async {
-    token = await NyStorage.read("user_token");
     await loadMarkers();
 
     _cardData['links'] = cardLinks;
@@ -175,7 +174,7 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
       'email': _cardData['email'],
       'links': _cardData['links'],
       "shortName": _cardData['shortName'],
-      "activeStatus": _cardData['activeStatus'],
+      "activeStatus": _cardData['activeStatus'].toString(),
       "marker": _cardData['marker'],
       "cardImage": cardImagefileName != null
           ? await MultipartFile.fromFile(
@@ -232,7 +231,7 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
       'email': _cardData['email'],
       'links': _cardData['links'],
       "shortName": _cardData['shortName'],
-      "activeStatus": _cardData['activeStatus'],
+      "activeStatus": _cardData['activeStatus'].toString(),
       "marker": _cardData['marker'],
       "cardImage": cardImagefileName != null
           ? await MultipartFile.fromFile(
@@ -289,18 +288,42 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
     });
   }
 
-  Future<dynamic> _loadBottomSheetWebView(BuildContext context, String token) {
+  HeadlessInAppWebView? headlessWebView;
+  InAppWebViewController? webViewController;
+  InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
+    crossPlatform: InAppWebViewOptions(
+      useShouldOverrideUrlLoading: true,
+      mediaPlaybackRequiresUserGesture: false,
+    ),
+    android: AndroidInAppWebViewOptions(
+      useHybridComposition: true,
+      allowFileAccess: true,
+      allowContentAccess: true,
+    ),
+    ios: IOSInAppWebViewOptions(
+      allowsInlineMediaPlayback: true,
+    ),
+  );
+  Future<dynamic> _loadBottomSheetWebView(
+      BuildContext context, String token) async {
+    token = await NyStorage.read("user_id");
+    print(token);
     return showMaterialModalBottomSheet(
+      bounce: true,
       context: context,
       builder: (context) => SizedBox(
-        height: 800,
-        child: WebView(
-          initialUrl:
+        height: 750,
+        child: InAppWebView(
+          initialOptions: options,
+          initialUrlRequest: URLRequest(
+            iosAllowsCellularAccess: true,
+            iosAllowsExpensiveNetworkAccess: true,
+            url: Uri.parse(
               'https://sailspad-client-dev.vercel.app/mobile-marker-upload/$token',
-          javascriptMode: JavascriptMode.unrestricted,
+            ),
+          ),
         ),
       ),
-      isDismissible: true,
     );
   }
 
@@ -326,7 +349,7 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
           ),
           child: _isLoadingCard
               ? SizedBox(
-                  child: SpinKitWave(
+                  child: SpinKitDualRing(
                     color: Colors.white,
                     size: 50.0,
                   ),
@@ -433,7 +456,12 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('https://cards.sailspad.com/'),
+                                    Text(
+                                      'https://cards.sailspad.com/',
+                                      style: TextStyle(
+                                        color: Color(0xFF414546),
+                                      ),
+                                    ),
                                     SizedBox(
                                       width: mediaQuery.size.width * 0.25,
                                       child: AuthFormField(
@@ -494,6 +522,8 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
+                                                              color: Color(
+                                                                  0xFF414546),
                                                             ),
                                                             overflow:
                                                                 TextOverflow
@@ -526,6 +556,8 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .bold,
+                                                                    color: Color(
+                                                                        0xFF414546),
                                                                     // color: Colors.white,
                                                                   ),
                                                                   overflow:
@@ -547,6 +579,7 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                                     icon: const FaIcon(
                                                       FontAwesomeIcons
                                                           .chevronDown,
+                                                      color: Color(0xFF414546),
                                                     ),
                                                     iconSize: 10,
                                                     buttonHeight: 35,
@@ -644,11 +677,17 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceAround,
                                         children: [
-                                          FaIcon(FontAwesomeIcons.plus,
-                                              size: 15),
+                                          FaIcon(
+                                            FontAwesomeIcons.plus,
+                                            size: 15,
+                                            color: Color(0xFF414546),
+                                          ),
                                           Text(
                                             'Add',
-                                            style: TextStyle(fontSize: 12),
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Color(0xFF414546),
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -726,7 +765,7 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                           ),
                                           Container(
                                             width: mediaQuery.size.width * 0.18,
-                                            color: Colors.grey,
+                                            color: Color(0xFF414546),
                                             child: _isLoadingMarkers!
                                                 ? SizedBox(
                                                     child:
@@ -770,16 +809,37 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                                               );
                                                             },
                                                             child: Container(
-                                                              margin: EdgeInsets
-                                                                  .only(
-                                                                      bottom:
-                                                                          5),
-                                                              child:
-                                                                  Image.network(
-                                                                loadedMarkers[i]
-                                                                    [
-                                                                    'markerImage'],
+                                                              height: 40,
+                                                              width: double
+                                                                  .infinity,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            5),
+                                                                border:
+                                                                    Border.all(
+                                                                  width: 0.5,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                                image:
+                                                                    DecorationImage(
+                                                                  image:
+                                                                      NetworkImage(
+                                                                    loadedMarkers[
+                                                                            i][
+                                                                        'markerImage'],
+                                                                  ),
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                ),
                                                               ),
+                                                              margin: EdgeInsets
+                                                                  .symmetric(
+                                                                      vertical:
+                                                                          5),
                                                             ),
                                                           );
                                                         },
@@ -802,9 +862,10 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                           RoundedButton(
                                             height: 30,
                                             width: mediaQuery.size.width * 0.55,
-                                            onPressed: () {
-                                              _loadBottomSheetWebView(
+                                            onPressed: () async {
+                                              await _loadBottomSheetWebView(
                                                   context, token);
+                                              await loadMarkers();
                                             },
                                             child: Row(
                                               mainAxisAlignment:
@@ -818,8 +879,10 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                                 ),
                                                 Text(
                                                   'Upload new Business Card',
-                                                  style:
-                                                      TextStyle(fontSize: 12),
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Color(0xFF414546),
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -867,7 +930,7 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                           },
                           child: _isLoading
                               ? SizedBox(
-                                  child: SpinKitChasingDots(
+                                  child: SpinKitDualRing(
                                     color: Colors.grey,
                                     size: 20.0,
                                   ),
@@ -876,7 +939,10 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                 )
                               : Text(
                                   editMode ? "Update Card" : 'Create Card',
-                                  style: TextStyle(fontSize: 12),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFF414546),
+                                  ),
                                 ),
                           margin: EdgeInsets.only(top: 40),
                         ),

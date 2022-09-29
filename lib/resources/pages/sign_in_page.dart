@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:sailspad/resources/widgets/auth_form_field.dart';
 
@@ -44,7 +45,14 @@ class _SignInPageState extends NyState<SignInPage> {
     );
     if (response != null) {
       await NyStorage.store('user_token', response.accessToken);
-      routeTo('/tabs-page', navigationType: NavigationType.popAndPushNamed);
+      await NyStorage.store('user_id', response.id);
+
+      SchedulerBinding.instance.addPostFrameCallback(
+        (_) async {
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              '/tabs-page', (Route<dynamic> route) => false);
+        },
+      );
     }
     setState(() {
       _isLoading = false;

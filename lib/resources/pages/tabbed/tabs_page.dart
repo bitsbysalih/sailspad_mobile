@@ -62,15 +62,15 @@ class _TabsPageState extends NyState<TabsPage> {
       {'page': ProfilePage(), 'title': 'Profile'},
       {'page': CreateCardPage(), 'title': 'CreateCard'},
     ];
-    loadUserDetails();
+    await loadUserDetails();
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     super.dispose();
   }
 
-  void loadUserDetails() async {
+  Future<void> loadUserDetails() async {
     final response = await api<UserApiService>(
       (request) => request.getuserDetails(),
       context: context,
@@ -84,157 +84,163 @@ class _TabsPageState extends NyState<TabsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 80,
-        elevation: 0,
-        shadowColor: Color.fromARGB(255, 182, 182, 182),
-        backgroundColor: Color(0xFFD8E3E9),
-        automaticallyImplyLeading: false,
-        flexibleSpace: Container(
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 80,
+          elevation: 0,
+          shadowColor: Color.fromARGB(255, 182, 182, 182),
+          backgroundColor: Color(0xFFD8E3E9),
+          automaticallyImplyLeading: false,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  width: 0.2,
+                  color: Color(0xFF455154),
+                ),
+              ),
+            ),
+            padding: EdgeInsets.only(top: 30, left: 24, right: 24),
+            height: double.infinity,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                //user details
+                Container(
+                  child: Row(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(right: 10),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white, width: 4),
+                          borderRadius: BorderRadius.circular(54),
+                        ),
+                        child: CircleAvatar(
+                          backgroundImage:
+                              _userDetails['profilePhoto'].isNotEmpty
+                                  ? NetworkImage(_userDetails['profilePhoto']!)
+                                      as ImageProvider
+                                  : AssetImage(
+                                      'public/assets/images/nylo_logo.png'),
+                        ),
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _userDetails['firstName'] +
+                                " " +
+                                _userDetails['lastName'],
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 15),
+                          ),
+                          Text(
+                            _userDetails['jobTitle'],
+                            style: TextStyle(
+                                fontWeight: FontWeight.w300, fontSize: 12),
+                          ),
+                          Text(
+                            _userDetails['availableCardSlots'].toString() +
+                                "/" +
+                                _userDetails['cardSlots'].toString(),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            GestureDetector(
+              onTap: () async {
+                await loadUserDetails();
+                routeTo('/settings-page');
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                child: FaIcon(
+                  FontAwesomeIcons.gear,
+                  color: Color(0xFF637579),
+                ),
+              ),
+            ),
+          ],
+        ),
+        body: Container(
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
                 width: 0.2,
-                color: Color(0xFF455154),
+                // color: Color(0xFF455154),
+                color: Colors.red,
               ),
             ),
+            image: DecorationImage(
+              image: AssetImage('public/assets/images/gradient_background.png'),
+              fit: BoxFit.cover,
+            ),
           ),
-          padding: EdgeInsets.only(top: 30, left: 24, right: 24),
-          height: double.infinity,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              //user details
-              Container(
-                child: Row(
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(right: 10),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white, width: 4),
-                        borderRadius: BorderRadius.circular(54),
-                      ),
-                      child: CircleAvatar(
-                        backgroundImage: _userDetails['profilePhoto'].isNotEmpty
-                            ? NetworkImage(_userDetails['profilePhoto']!)
-                                as ImageProvider
-                            : AssetImage('public/assets/images/nylo_logo.png'),
-                      ),
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _userDetails['firstName'] +
-                              " " +
-                              _userDetails['lastName'],
-                          style: TextStyle(
-                              fontWeight: FontWeight.w500, fontSize: 15),
-                        ),
-                        Text(
-                          _userDetails['jobTitle'],
-                          style: TextStyle(
-                              fontWeight: FontWeight.w300, fontSize: 12),
-                        ),
-                        Text(
-                          _userDetails['availableCardSlots'].toString() +
-                              "/" +
-                              _userDetails['cardSlots'].toString(),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ],
-          ),
+          width: mediaQuery.size.width,
+          height: mediaQuery.size.height,
+          child: pages[_selectedPageIndex]['page'] as Widget,
         ),
-        actions: [
-          GestureDetector(
-            onTap: () {
-              routeTo('/settings-page');
-            },
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-              child: FaIcon(
-                FontAwesomeIcons.gear,
-                color: Color(0xFF637579),
-              ),
+        extendBody: true,
+        bottomNavigationBar: DotNavigationBar(
+          borderRadius: 50,
+          enableFloatingNavBar: true,
+          itemPadding: EdgeInsets.only(top: 2, bottom: 2),
+          marginR: EdgeInsets.only(
+              right: 25, left: 25, bottom: Platform.isAndroid ? 45 : 0),
+          paddingR: EdgeInsets.only(right: 25, left: 25, top: 15),
+          enablePaddingAnimation: false,
+          dotIndicatorColor: Colors.transparent,
+          backgroundColor: Color(0xFFE4E9EA).withOpacity(0.5),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              spreadRadius: -10,
+              blurRadius: 20,
+              offset: Offset(0, 10),
+            )
+          ],
+          currentIndex: _selectedPageIndex,
+          onTap: _selectPage,
+          items: [
+            //Home
+            DotNavigationBarItem(
+              icon: Icon(SailspadIcons.home_icon),
+              selectedColor: Color(0xFF455154),
+              unselectedColor: Color(0xFF637579),
             ),
-          ),
-        ],
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              width: 0.2,
-              // color: Color(0xFF455154),
-              color: Colors.red,
+
+            //Analytics
+            DotNavigationBarItem(
+              icon: Icon(SailspadIcons.stats_icon),
+              selectedColor: Color(0xFF455154),
+              unselectedColor: Color(0xFF637579),
             ),
-          ),
-          image: DecorationImage(
-            image: AssetImage('public/assets/images/gradient_background.png'),
-            fit: BoxFit.cover,
-          ),
+
+            //User Profile
+            DotNavigationBarItem(
+              icon: Icon(SailspadIcons.user_icon),
+              selectedColor: Color(0xFF455154),
+              unselectedColor: Color(0xFF637579),
+            ),
+
+            //Create New Card
+            DotNavigationBarItem(
+              icon: FaIcon(FontAwesomeIcons.circlePlus),
+              selectedColor: Color(0xFF455154),
+              unselectedColor: Color(0xFF637579),
+            ),
+          ],
         ),
-        width: mediaQuery.size.width,
-        height: mediaQuery.size.height,
-        child: pages[_selectedPageIndex]['page'] as Widget,
-      ),
-      extendBody: true,
-      bottomNavigationBar: DotNavigationBar(
-        borderRadius: 50,
-        enableFloatingNavBar: true,
-        itemPadding: EdgeInsets.only(top: 2, bottom: 2),
-        marginR: EdgeInsets.only(
-            right: 25, left: 25, bottom: Platform.isAndroid ? 45 : 0),
-        paddingR: EdgeInsets.only(right: 25, left: 25, top: 15),
-        enablePaddingAnimation: false,
-        dotIndicatorColor: Colors.transparent,
-        backgroundColor: Color(0xFFE4E9EA).withOpacity(0.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            spreadRadius: -10,
-            blurRadius: 20,
-            offset: Offset(0, 10),
-          )
-        ],
-        currentIndex: _selectedPageIndex,
-        onTap: _selectPage,
-        items: [
-          //Home
-          DotNavigationBarItem(
-            icon: Icon(SailspadIcons.home_icon),
-            selectedColor: Color(0xFF455154),
-            unselectedColor: Color(0xFF637579),
-          ),
-
-          //Analytics
-          DotNavigationBarItem(
-            icon: Icon(SailspadIcons.stats_icon),
-            selectedColor: Color(0xFF455154),
-            unselectedColor: Color(0xFF637579),
-          ),
-
-          //User Profile
-          DotNavigationBarItem(
-            icon: Icon(SailspadIcons.user_icon),
-            selectedColor: Color(0xFF455154),
-            unselectedColor: Color(0xFF637579),
-          ),
-
-          //Create New Card
-          DotNavigationBarItem(
-            icon: FaIcon(FontAwesomeIcons.circlePlus),
-            selectedColor: Color(0xFF455154),
-            unselectedColor: Color(0xFF637579),
-          ),
-        ],
       ),
     );
   }

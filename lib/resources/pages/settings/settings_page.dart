@@ -1,10 +1,24 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nylo_framework/nylo_framework.dart';
+import 'package:sailspad/resources/pages/sign_in_page.dart';
+import 'package:sailspad/resources/widgets/auth_form_field.dart';
+import 'package:sailspad/resources/widgets/rounded_button.dart';
+
 import '../../../app/controllers/controller.dart';
 import '../../../app/networking/user_api_service.dart';
 import '../../../bootstrap/helpers.dart';
+import '../../widgets/profile_photo_input.dart';
 import '../../widgets/settings_button.dart';
+
+enum PageState {
+  normal,
+  userDetails,
+}
 
 class SettingsPage extends NyStatefulWidget {
   final Controller controller = Controller();
@@ -15,6 +29,7 @@ class SettingsPage extends NyStatefulWidget {
 }
 
 class _SettingsPageState extends NyState<SettingsPage> {
+  File? _newProfilePhoto;
   Map _userDetails = {
     "firstName": "",
     "lastName": "",
@@ -24,9 +39,14 @@ class _SettingsPageState extends NyState<SettingsPage> {
     "cardSlots": int,
     "availableCardSlots": int
   };
+
+  bool _isLoading = false;
+
+  PageState pageState = PageState.normal;
+
   @override
   init() async {
-    loadUserDetails();
+    await loadUserDetails();
   }
 
   @override
@@ -34,7 +54,14 @@ class _SettingsPageState extends NyState<SettingsPage> {
     super.dispose();
   }
 
-  void loadUserDetails() async {
+  void _selectProfilePhoto(File pickedImage) async {
+    _newProfilePhoto = pickedImage;
+    setState(() {
+      _userDetails['profilePhoto'] = _newProfilePhoto;
+    });
+  }
+
+  Future<void> loadUserDetails() async {
     final response = await api<UserApiService>(
       (request) => request.getuserDetails(),
       context: context,
@@ -44,6 +71,94 @@ class _SettingsPageState extends NyState<SettingsPage> {
         _userDetails = response;
       });
     }
+  }
+
+  Future<void> changeUserDetails() async {
+    String? profilePhotofileName = _newProfilePhoto?.path.split('/').last;
+    FormData formData = new FormData.fromMap({
+      "firstName": _userDetails['firstName'],
+      "lastName": _userDetails['lastName'],
+      'jobTitle': _userDetails['jobTitle'],
+      "profilePhoto": profilePhotofileName != null
+          ? await MultipartFile.fromFile(
+              _newProfilePhoto!.path,
+              filename: profilePhotofileName,
+            )
+          : '',
+    });
+    setState(() {
+      _isLoading = true;
+    });
+    final response = await api<UserApiService>(
+      (request) => request.update(
+        data: formData,
+      ),
+    );
+    if (response != null) {
+      pageState = PageState.normal;
+    }
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Widget userDetailsInput() {
+    return Container(
+      child: Column(
+        children: [
+          AuthFormField(
+            label: 'First Name',
+            initialValue: _userDetails['firstName'],
+            onChanged: (value) {
+              _userDetails['firstName'] = value;
+            },
+          ),
+          AuthFormField(
+            label: 'Last Name',
+            initialValue: _userDetails['lastName'],
+            onChanged: (value) {
+              _userDetails['lastName'] = value;
+            },
+          ),
+          AuthFormField(
+            label: 'Job Title',
+            initialValue: _userDetails['jobTitle'],
+            onChanged: (value) {
+              _userDetails['jobTitle'] = value;
+            },
+          ),
+          RoundedButton(
+            width: 140,
+            child: _isLoading
+                ? SizedBox(
+                    child: SpinKitChasingDots(
+                      color: Colors.grey,
+                      size: 20.0,
+                    ),
+                    height: 20.0,
+                    width: 20.0,
+                  )
+                : Text('Update User'),
+            onPressed: () async {
+              await changeUserDetails();
+            },
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                pageState = PageState.normal;
+              });
+            },
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: Color(0xFF414546),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -59,7 +174,12 @@ class _SettingsPageState extends NyState<SettingsPage> {
           ),
           child: FaIcon(FontAwesomeIcons.arrowLeft),
           onPressed: () {
-            Navigator.of(context).pop();
+            SchedulerBinding.instance.addPostFrameCallback(
+              (_) async {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/tabs-page', (Route<dynamic> route) => false);
+              },
+            );
           },
         ),
         title: Text(
@@ -88,25 +208,21 @@ class _SettingsPageState extends NyState<SettingsPage> {
             Container(
               child: Column(
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        width: 2,
-                        color: Color(0xFFE3E3E3),
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      image: DecorationImage(
-                        image: _userDetails['profilePhoto']!.isNotEmpty
-                            ? NetworkImage(_userDetails['profilePhoto']!)
-                                as ImageProvider
-                            : AssetImage(
-                                'public/assets/images/john-smith.jpeg',
-                              ),
-                        fit: BoxFit.cover,
+                  InkWell(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          pageState = PageState.userDetails;
+                        });
+                      },
+                      child: ProfilePhotoInput(
+                        profilePhoto: _userDetails['profilePhoto'] != null
+                            ? _userDetails['profilePhoto'].toString()
+                            : '',
+                        showSelector: pageState == PageState.userDetails,
+                        onSelectImage: _selectProfilePhoto,
                       ),
                     ),
-                    width: 100,
-                    height: 100,
                   ),
                   Text(
                     _userDetails['firstName'] +
@@ -125,39 +241,44 @@ class _SettingsPageState extends NyState<SettingsPage> {
                 ],
               ),
             ),
-            Column(
-              children: [
-                SettingsButton(
-                  label: 'Subscriptions',
-                  icon: FontAwesomeIcons.creditCard,
-                  onPressed: () {},
-                ),
-                SettingsButton(
-                  label: 'Security',
-                  icon: FontAwesomeIcons.unlockKeyhole,
-                  onPressed: () {
-                    routeTo(
-                      '/settings-page/security',
-                      data: {
-                        'email': _userDetails['email'],
-                        "cardSlots": _userDetails['cardSlots'],
-                      },
-                    );
-                  },
-                ),
-                SettingsButton(
-                  label: 'Logout',
-                  icon: FontAwesomeIcons.arrowRightFromBracket,
-                  onPressed: () {
-                    NyStorage.delete('user_token');
-                    routeTo(
-                      '/sign-in-page',
-                      navigationType: NavigationType.popAndPushNamed,
-                    );
-                  },
-                ),
-              ],
-            )
+            if (pageState == PageState.normal)
+              Column(
+                children: [
+                  SettingsButton(
+                    label: 'Subscriptions',
+                    icon: FontAwesomeIcons.creditCard,
+                    onPressed: () {},
+                  ),
+                  SettingsButton(
+                    label: 'Security',
+                    icon: FontAwesomeIcons.unlockKeyhole,
+                    onPressed: () {
+                      routeTo(
+                        '/settings-page/security',
+                        data: {
+                          'email': _userDetails['email'],
+                          "cardSlots": _userDetails['cardSlots'],
+                        },
+                      );
+                    },
+                  ),
+                  SettingsButton(
+                    label: 'Logout',
+                    icon: FontAwesomeIcons.arrowRightFromBracket,
+                    onPressed: () async {
+                      await NyStorage.delete('user_token');
+                      SchedulerBinding.instance.addPostFrameCallback(
+                        (_) async {
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                              '/sign-in-page', (Route<dynamic> route) => false);
+                        },
+                      );
+                    },
+                  ),
+                ],
+              )
+            else if (pageState == PageState.userDetails)
+              userDetailsInput(),
           ],
         ),
       ),

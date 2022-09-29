@@ -2,12 +2,11 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:sailspad/resources/widgets/sailspad_icons.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../app/networking/ar_card_api_service.dart';
 import '../../bootstrap/helpers.dart';
@@ -22,6 +21,7 @@ class CardListItem extends StatefulWidget {
     required this.uniqueId,
     required this.cardImage,
     required this.switchToEdit,
+    required this.deleteCard,
   }) : super(key: key);
   final String? id;
   final String? name;
@@ -29,6 +29,7 @@ class CardListItem extends StatefulWidget {
   final String? uniqueId;
   final String? cardImage;
   final Function switchToEdit;
+  final Function deleteCard;
 
   @override
   State<CardListItem> createState() => _CardListItemState();
@@ -38,21 +39,41 @@ class _CardListItemState extends NyState<CardListItem> {
   // final Completer<WebViewController> _controller =
   //     Completer<WebViewController>();
   @override
-  init() {
-    if (Platform.isAndroid) WebView.platform = AndroidWebView();
+  init() async {
+    if (Platform.isAndroid) {
+      await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+    }
     return super.init();
   }
+
+  HeadlessInAppWebView? headlessWebView;
+  InAppWebViewController? webViewController;
+  InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
+      crossPlatform: InAppWebViewOptions(
+        useShouldOverrideUrlLoading: true,
+        mediaPlaybackRequiresUserGesture: false,
+      ),
+      android: AndroidInAppWebViewOptions(
+        useHybridComposition: true,
+        allowFileAccess: true,
+        allowContentAccess: true,
+      ),
+      ios: IOSInAppWebViewOptions(
+        allowsInlineMediaPlayback: true,
+      ));
 
   Future<dynamic> _showARBottomSheet(BuildContext context) {
     return showMaterialModalBottomSheet(
       context: context,
       builder: (context) => SizedBox(
         height: 750,
-        child: WebView(
-          initialUrl:
+        child: InAppWebView(
+          initialOptions: options,
+          initialUrlRequest: URLRequest(
+            url: Uri.parse(
               'https://sailspad-card-viewer-bitsbysalih.vercel.app/cards/${widget.id}/view',
-          javascriptMode: JavascriptMode.unrestricted,
-          allowsInlineMediaPlayback: true,
+            ),
+          ),
         ),
       ),
       isDismissible: true,
@@ -65,13 +86,15 @@ class _CardListItemState extends NyState<CardListItem> {
       context: context,
       builder: (context) => SizedBox(
         height: 750,
-        child: WebView(
-          initialUrl:
+        child: InAppWebView(
+          initialOptions: options,
+          initialUrlRequest: URLRequest(
+            url: Uri.parse(
               'https://sailspad-card-viewer-bitsbysalih.vercel.app/cards/${widget.id}/qrcode',
-          javascriptMode: JavascriptMode.unrestricted,
+            ),
+          ),
         ),
       ),
-      isDismissible: true,
     );
   }
 
@@ -135,6 +158,7 @@ class _CardListItemState extends NyState<CardListItem> {
                           ),
                           Text(
                             widget.title!,
+                            textAlign: TextAlign.justify,
                             style: TextStyle(fontSize: 10),
                           ),
                         ],
@@ -179,7 +203,9 @@ class _CardListItemState extends NyState<CardListItem> {
                 ),
                 CustomIconButton(
                   label: 'Delete',
-                  onTap: () {},
+                  onTap: () {
+                    widget.deleteCard(widget.id);
+                  },
                   icon: FontAwesomeIcons.solidTrashCan,
                 ),
               ],

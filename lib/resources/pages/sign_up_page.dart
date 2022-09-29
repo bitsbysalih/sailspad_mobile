@@ -3,6 +3,7 @@ import 'dart:io' show File;
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -13,7 +14,6 @@ import '../../app/controllers/sign_up_controller.dart';
 import '../../app/networking/user_api_service.dart';
 import '../../bootstrap/helpers.dart';
 import '../widgets/auth_form_field.dart';
-import '../widgets/card_link_item.dart';
 import '../widgets/rounded_button.dart';
 
 class SignUpPage extends NyStatefulWidget {
@@ -113,20 +113,31 @@ class _SignUpPageState extends NyState<SignUpPage> {
   }
 
   void initialSignUp() async {
-    setState(() {
-      _isLoading = true;
-    });
-    String fileName = _profilePhoto!.path.split('/').last;
+    String? fileName = _profilePhoto?.path.split('/').last;
     FormData formData = new FormData.fromMap({
       "firstName": _signUpData['firstName'],
       "lastName": _signUpData['lastName'],
       'jobTitle': _signUpData['jobTitle'],
       'email': _signUpData['email'],
       'password': _signUpData['password'],
-      "profilePhoto": await MultipartFile.fromFile(
-        _profilePhoto!.path,
-        filename: fileName,
-      ),
+      "profilePhoto": fileName != null
+          ? await MultipartFile.fromFile(
+              _profilePhoto!.path,
+              filename: fileName,
+            )
+          : '',
+    });
+    if (fileName == null) {
+      showToastNotification(
+        context,
+        title: 'Error',
+        description: 'Profile Photo can\'t be empty',
+        style: ToastNotificationStyleType.DANGER,
+      );
+      return;
+    }
+    setState(() {
+      _isLoading = true;
     });
     final response = await api<UserApiService>(
       (request) => request.signUp(data: formData),
@@ -134,6 +145,8 @@ class _SignUpPageState extends NyState<SignUpPage> {
     );
     if (response != null) {
       await NyStorage.store('user_token', response.accessToken);
+      await NyStorage.store('user_id', response.id);
+
       moveToNext();
     }
     setState(() {
@@ -191,11 +204,16 @@ class _SignUpPageState extends NyState<SignUpPage> {
       );
     }
 
+    await createCardFromSignUp();
     setState(() {
       _isLoading = false;
     });
-    await createCardFromSignUp();
-    routeTo('/tabs-page', navigationType: NavigationType.popAndPushNamed);
+    SchedulerBinding.instance.addPostFrameCallback(
+      (_) async {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+            '/tabs-page', (Route<dynamic> route) => false);
+      },
+    );
   }
 
   Future<void> createCardFromSignUp() async {

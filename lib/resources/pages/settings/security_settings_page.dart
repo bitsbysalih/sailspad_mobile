@@ -1,5 +1,8 @@
-import 'package:analyzer/dart/ast/ast.dart';
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:nylo_framework/nylo_framework.dart';
@@ -31,10 +34,13 @@ class _SecuritySettingsPageState extends NyState<SecuritySettingsPage> {
   String otp = '';
   String newEmail = '';
   String newPassword = '';
+  String password = '';
   Map userDetails = {
     "email": '',
     'cardSlots': int,
   };
+
+  TextEditingController passwordInputController = TextEditingController();
 
   PageState pageState = PageState.normal;
 
@@ -43,6 +49,14 @@ class _SecuritySettingsPageState extends NyState<SecuritySettingsPage> {
   init() async {
     userDetails = widget.data();
     print(widget.data());
+    if (await NyStorage.read('user_token') == null) {
+      SchedulerBinding.instance.addPostFrameCallback(
+        (_) async {
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              '/sign-in-page', (Route<dynamic> route) => false);
+        },
+      );
+    }
   }
 
   @override
@@ -112,6 +126,7 @@ class _SecuritySettingsPageState extends NyState<SecuritySettingsPage> {
         pageState = PageState.normal;
         _isLoading = false;
       });
+      Navigator.of(context).pop();
       return;
     }
     setState(() {
@@ -136,11 +151,31 @@ class _SecuritySettingsPageState extends NyState<SecuritySettingsPage> {
         _isLoading = false;
       });
       await NyStorage.store('user_token', response.accessToken);
+      Navigator.of(context).pop();
       return;
     }
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<void> deleteAccount() async {
+    final response = await api<UserApiService>(
+      (request) => request.delete(
+        data: {"password": passwordInputController.text},
+      ),
+    );
+    if (response != null) {
+      await NyStorage.delete("user_token");
+      await NyStorage.delete("user_id");
+      Navigator.of(context).pop();
+      SchedulerBinding.instance.addPostFrameCallback(
+        (_) async {
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              '/sign-in-page', (Route<dynamic> route) => false);
+        },
+      );
+    }
   }
 
   Widget showNewPasswordField() {
@@ -193,8 +228,9 @@ class _SecuritySettingsPageState extends NyState<SecuritySettingsPage> {
   Future<dynamic> _showBottomSheet(BuildContext context) {
     return showMaterialModalBottomSheet(
       context: context,
-      builder: (context) => SizedBox(
-        height: 500,
+      builder: (context) => Container(
+        padding: EdgeInsets.symmetric(horizontal: 30),
+        height: 600,
         width: mediaQuery.size.width * 0.5,
         child: SizedBox(
           child: Container(
@@ -254,6 +290,82 @@ class _SecuritySettingsPageState extends NyState<SecuritySettingsPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Future<void> _showAndroidDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Account Deletion'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: [
+                Text('Are you sure you want to delete this account?'),
+                TextField(
+                  decoration: InputDecoration(hintText: 'Password'),
+                  obscureText: true,
+                  controller: passwordInputController,
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () async {
+                await deleteAccount();
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showIosDialog(BuildContext context) async {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoAlertDialog(
+        title: const Text('Account Deletion'),
+        content: Column(
+          children: [
+            Text('Are you sure you want to delete your account?'),
+            CupertinoTextField(
+              obscureText: true,
+              placeholder: 'Password',
+              controller: passwordInputController,
+            ),
+          ],
+        ),
+        actions: <CupertinoDialogAction>[
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Cancel'),
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () async {
+              await deleteAccount();
+            },
+            child: const Text('Delete'),
+          ),
+        ],
       ),
     );
   }
@@ -318,9 +430,9 @@ class _SecuritySettingsPageState extends NyState<SecuritySettingsPage> {
                       Text(userDetails['email']),
                       Wrap(
                         children: [
-                          Text('Personal Subscription (Monthly)'),
+                          Text('Personal (Monthly)'),
                           SizedBox(
-                            width: 10,
+                            width: 2,
                           ),
                           Wrap(
                             children: [
@@ -360,8 +472,10 @@ class _SecuritySettingsPageState extends NyState<SecuritySettingsPage> {
                     label: 'Delete Account',
                     icon: FontAwesomeIcons.trash,
                     onPressed: () {
-                      // NyStorage.delete('user_token');
-                      // routeTo('/sign-in-page');
+                      if (Platform.isIOS) {
+                        _showIosDialog(context);
+                      } else
+                        _showAndroidDialog();
                     },
                   ),
                 ],

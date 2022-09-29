@@ -88,18 +88,26 @@ class UserApiService extends BaseApiService {
     );
   }
 
+  ///Check password
+  Future<User?> checkPassword({dynamic query}) async {
+    return await network<User>(
+      request: (request) =>
+          request.put("/user/check-password", queryParameters: query),
+    );
+  }
+
   /// Delete a User
-  Future<bool?> delete({required int id}) async {
-    return await network<bool>(
-      request: (request) => request.delete("/endpoint-path/$id"),
+  Future<User?> delete({dynamic data}) async {
+    return await network<User>(
+      request: (request) => request.delete("/user/delete", data: data),
     );
   }
 
   displayError(DioError dioError, BuildContext context) {
     showToastNotification(
       context,
-      title: 'Error on Sign up',
-      description: dioError.response!.data['message'],
+      title: 'Error',
+      description: dioError.response?.data['message'],
       style: ToastNotificationStyleType.DANGER,
     );
   }

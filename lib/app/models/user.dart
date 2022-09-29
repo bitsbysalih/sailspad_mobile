@@ -23,6 +23,7 @@ class User {
   });
 
   User.fromJson(dynamic data) {
+    id = data['id'];
     firstName = data['firstName'];
     lastName = data['lastName'];
     email = data['email'];
@@ -34,6 +35,7 @@ class User {
   }
 
   toJson() => {
+        'id': id,
         "firstName": firstName,
         "lastName": lastName,
         'email': email,

@@ -48,9 +48,9 @@ class ArCardApiService extends BaseApiService {
   }
 
   /// Delete a ArCard
-  Future<bool?> delete({required int id}) async {
+  Future<bool?> delete({required String id}) async {
     return await network<bool>(
-      request: (request) => request.delete("/endpoint-path/$id"),
+      request: (request) => request.delete("/card/$id/delete"),
     );
   }
 
@@ -65,8 +65,8 @@ class ArCardApiService extends BaseApiService {
   displayError(DioError dioError, BuildContext context) {
     showToastNotification(
       context,
-      title: 'Error Creating card',
-      description: dioError.response!.data['errors'].toString(),
+      title: 'Error',
+      description: dioError.response?.data['message'],
       style: ToastNotificationStyleType.DANGER,
     );
   }

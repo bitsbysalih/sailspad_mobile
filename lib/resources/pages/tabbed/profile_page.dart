@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nylo_framework/nylo_framework.dart';
+import 'package:sailspad/app/networking/ar_card_api_service.dart';
+import 'package:sailspad/resources/widgets/profile_photo_input.dart';
 
 import '../../../app/controllers/controller.dart';
 import '../../../app/networking/user_api_service.dart';
@@ -16,17 +18,15 @@ class ProfilePage extends NyStatefulWidget {
 
 class _ProfilePageState extends NyState<ProfilePage> {
   Map _userDetails = {
-    "firstName": "",
-    "lastName": "",
-    'profilePhoto': '',
-    "jobTitle": '',
-    "cardSlots": int,
-    'availableCardSlots': int,
-    "link": [],
+    "name": "",
+    "title": "",
+    'cardImage': '',
+    "about": '',
+    "links": [],
   };
   @override
   init() async {
-    loadUserDetails();
+    await loadUserDetails();
   }
 
   @override
@@ -34,16 +34,48 @@ class _ProfilePageState extends NyState<ProfilePage> {
     super.dispose();
   }
 
-  void loadUserDetails() async {
-    final response = await api<UserApiService>(
-      (request) => request.getuserDetails(),
+  Future<void> loadUserDetails() async {
+    final response = await api<ArCardApiService>(
+      (request) => request.fetchAll(),
       context: context,
     );
     if (response != null) {
       setState(() {
-        _userDetails = response;
+        _userDetails = {
+          "name": response[0].name,
+          "title": response[0].title,
+          'about': response[0].about,
+          "cardImage": response[0].cardImage,
+          "links": response[0].links,
+        };
       });
     }
+  }
+
+  final List<String> items = [
+    'instagram',
+    'facebook',
+    'linkedin',
+    'twitter',
+    'website',
+    'github',
+  ];
+
+  IconData iconSelector(String iconName) {
+    if (iconName == 'instagram') {
+      return FontAwesomeIcons.instagram;
+    } else if (iconName == 'twitter') {
+      return FontAwesomeIcons.twitter;
+    } else if (iconName == 'facebook') {
+      return FontAwesomeIcons.facebook;
+    } else if (iconName == 'linkedin') {
+      return FontAwesomeIcons.linkedin;
+    } else if (iconName == 'website') {
+      return FontAwesomeIcons.globe;
+    } else if (iconName == 'github') {
+      return FontAwesomeIcons.github;
+    }
+    return FontAwesomeIcons.a;
   }
 
   @override
@@ -67,31 +99,15 @@ class _ProfilePageState extends NyState<ProfilePage> {
             Container(
               child: Column(
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(27),
-                      border: Border.all(
-                        color: Color(0xFFE3E3E3),
-                        width: 3,
-                      ),
-                      image: DecorationImage(
-                        image: _userDetails['profilePhoto'].isNotEmpty
-                            ? NetworkImage(_userDetails['profilePhoto']!)
-                                as ImageProvider
-                            : AssetImage('public/assets/images/nylo_logo.png'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    width: mediaQuery.size.width * 0.28,
-                    height: mediaQuery.size.height * 0.12,
+                  ProfilePhotoInput(
+                    profilePhoto: _userDetails['cardImage'],
+                    showSelector: false,
                   ),
                   SizedBox(
                     height: mediaQuery.size.height * 0.1,
                     child: Center(
                       child: Text(
-                        _userDetails['firstName'] +
-                            " " +
-                            _userDetails['lastName'],
+                        _userDetails['name'],
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 36,
@@ -101,7 +117,7 @@ class _ProfilePageState extends NyState<ProfilePage> {
                     ),
                   ),
                   Text(
-                    _userDetails['jobTitle'],
+                    _userDetails['title'],
                     style: TextStyle(fontSize: 10),
                   ),
                 ],
@@ -117,8 +133,11 @@ class _ProfilePageState extends NyState<ProfilePage> {
               height: mediaQuery.size.height * 0.4,
               width: double.infinity,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  SizedBox(
+                    height: 30,
+                  ),
                   Text(
                     'About',
                     style: TextStyle(fontSize: 25),
@@ -126,11 +145,7 @@ class _ProfilePageState extends NyState<ProfilePage> {
                   Container(
                     margin: EdgeInsets.symmetric(vertical: 15),
                     child: Text(
-                      "Lorem Ipsum is simply dummy text of the printing and "
-                      "typesetting industry. Lorem Ipsum has been the industry's "
-                      "standard dummy text ever since the 1500s, when an unknown printer "
-                      "took a galley of type and scrambled it to make a type specimen book. "
-                      "It has survived not only five centuries.",
+                      _userDetails['about'],
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w300,
@@ -145,28 +160,12 @@ class _ProfilePageState extends NyState<ProfilePage> {
                     margin: EdgeInsets.symmetric(vertical: 15),
                     child: Wrap(
                       spacing: 30,
-                      children: [
-                        FaIcon(
-                          FontAwesomeIcons.instagram,
+                      children: (_userDetails['links'] as List).map((e) {
+                        return FaIcon(
+                          iconSelector(e['name']),
                           color: Color(0xFF455154),
-                        ),
-                        FaIcon(
-                          FontAwesomeIcons.linkedinIn,
-                          color: Color(0xFF455154),
-                        ),
-                        FaIcon(
-                          FontAwesomeIcons.pinterestP,
-                          color: Color(0xFF455154),
-                        ),
-                        FaIcon(
-                          FontAwesomeIcons.facebookF,
-                          color: Color(0xFF455154),
-                        ),
-                        FaIcon(
-                          FontAwesomeIcons.patreon,
-                          color: Color(0xFF455154),
-                        )
-                      ],
+                        );
+                      }).toList(),
                     ),
                   )
                 ],

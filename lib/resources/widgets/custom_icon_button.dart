@@ -22,13 +22,17 @@ class CustomIconButton extends StatelessWidget {
           FaIcon(
             icon,
             size: 25,
+            color: Color(0xFF414546),
           ),
           SizedBox(
             height: 9,
           ),
           Text(
             label,
-            style: TextStyle(fontSize: 10),
+            style: TextStyle(
+              fontSize: 10,
+              color: Color(0xFF414546),
+            ),
           )
         ],
       ),

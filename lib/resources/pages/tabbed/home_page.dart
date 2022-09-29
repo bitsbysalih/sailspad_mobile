@@ -23,7 +23,7 @@ class _HomePageState extends NyState<HomePage> {
   List loadedCards = [];
   @override
   init() async {
-    loadCards();
+    await loadCards();
   }
 
   @override
@@ -31,7 +31,7 @@ class _HomePageState extends NyState<HomePage> {
     super.dispose();
   }
 
-  void loadCards() async {
+  Future<void> loadCards() async {
     setState(() {
       _isLoading = true;
     });
@@ -46,6 +46,22 @@ class _HomePageState extends NyState<HomePage> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<void> deleteCard(String id) async {
+    final response = await api<ArCardApiService>(
+      (request) => request.delete(id: id),
+      context: context,
+    );
+
+    if (response != null) {
+      showToastNotification(
+        context,
+        title: 'Success',
+        description: 'Card deleted Successfully',
+      );
+      await loadCards();
+    }
   }
 
   @override
@@ -69,7 +85,7 @@ class _HomePageState extends NyState<HomePage> {
         ),
         child: _isLoading
             ? SizedBox(
-                child: SpinKitWave(
+                child: SpinKitDualRing(
                   color: Colors.white,
                   size: 50.0,
                 ),
@@ -85,6 +101,7 @@ class _HomePageState extends NyState<HomePage> {
                     itemBuilder: (ctx, i) {
                       return CardListItem(
                         switchToEdit: widget.switchToEdit,
+                        deleteCard: deleteCard,
                         id: loadedCards[i]!.id,
                         name: loadedCards[i]!.name,
                         title: loadedCards[i]!.title,
