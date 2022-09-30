@@ -28,6 +28,8 @@ class CreateCardPage extends NyStatefulWidget {
 }
 
 class _CreateCardPageState extends NyState<CreateCardPage> {
+  HeadlessInAppWebView? headlessWebView;
+  InAppWebViewController? webViewController;
   File? _cardImage;
   File? _logoImage;
   File? _backgroundImage;
@@ -99,6 +101,7 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
         cardId = request.returnCardId().toString();
       },
     );
+    token = await NyStorage.read("user_id");
 
     if (cardId!.isNotEmpty) {
       editMode = true;
@@ -288,17 +291,18 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
     });
   }
 
-  HeadlessInAppWebView? headlessWebView;
-  InAppWebViewController? webViewController;
   InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
     crossPlatform: InAppWebViewOptions(
       useShouldOverrideUrlLoading: true,
       mediaPlaybackRequiresUserGesture: false,
+      allowFileAccessFromFileURLs: true,
+      transparentBackground: true,
     ),
     android: AndroidInAppWebViewOptions(
-      useHybridComposition: true,
+      // useHybridComposition: true,
       allowFileAccess: true,
       allowContentAccess: true,
+      hardwareAcceleration: true,
     ),
     ios: IOSInAppWebViewOptions(
       allowsInlineMediaPlayback: true,
@@ -306,7 +310,6 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
   );
   Future<dynamic> _loadBottomSheetWebView(
       BuildContext context, String token) async {
-    token = await NyStorage.read("user_id");
     print(token);
     return showMaterialModalBottomSheet(
       bounce: true,

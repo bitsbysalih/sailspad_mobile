@@ -72,7 +72,7 @@ class _CardListItemState extends NyState<CardListItem> {
           initialOptions: options,
           initialUrlRequest: URLRequest(
             url: Uri.parse(
-              'https://sailspad-card-viewer-bitsbysalih.vercel.app/cards/${widget.id}/view',
+              'http://192.168.1.108:5173/card/${widget.id}/view',
             ),
           ),
         ),

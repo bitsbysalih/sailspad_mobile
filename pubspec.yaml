@@ -33,7 +33,6 @@ dependencies:
   webview_flutter: ^3.0.4
   flutter_inappwebview: ^5.4.3+7
   permission_handler: ^10.0.2
-  firebase_core: ^1.23.0
 
 dev_dependencies:
   flutter_launcher_icons: ^0.10.0

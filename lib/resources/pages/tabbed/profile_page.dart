@@ -133,17 +133,17 @@ class _ProfilePageState extends NyState<ProfilePage> {
               height: mediaQuery.size.height * 0.4,
               width: double.infinity,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Text(
-                    'About',
-                    style: TextStyle(fontSize: 25),
+                  Container(
+                    margin: EdgeInsets.only(top: 15),
+                    child: Text(
+                      'About',
+                      style: TextStyle(fontSize: 25),
+                    ),
                   ),
                   Container(
-                    margin: EdgeInsets.symmetric(vertical: 15),
+                    margin: EdgeInsets.only(top: 5),
                     child: Text(
                       _userDetails['about'],
                       style: TextStyle(
@@ -152,22 +152,28 @@ class _ProfilePageState extends NyState<ProfilePage> {
                       ),
                     ),
                   ),
-                  Text(
-                    'Connect on',
-                    style: TextStyle(fontSize: 25),
-                  ),
                   Container(
-                    margin: EdgeInsets.symmetric(vertical: 15),
-                    child: Wrap(
-                      spacing: 30,
-                      children: (_userDetails['links'] as List).map((e) {
-                        return FaIcon(
-                          iconSelector(e['name']),
-                          color: Color(0xFF455154),
-                        );
-                      }).toList(),
-                    ),
-                  )
+                      margin: EdgeInsets.symmetric(vertical: 15),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Connect on',
+                            style: TextStyle(fontSize: 25),
+                          ),
+                          SizedBox(
+                            height: 25,
+                          ),
+                          Wrap(
+                            spacing: 30,
+                            children: (_userDetails['links'] as List).map((e) {
+                              return FaIcon(
+                                iconSelector(e['name']),
+                                color: Color(0xFF455154),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ))
                 ],
               ),
             ),
