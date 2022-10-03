@@ -23,6 +23,12 @@ PODS:
     - Flutter
   - permission_handler_apple (9.0.4):
     - Flutter
+  - purchases_flutter (4.2.2):
+    - Flutter
+    - PurchasesHybridCommon (= 4.2.2)
+  - PurchasesHybridCommon (4.2.2):
+    - RevenueCat (= 4.11.0)
+  - RevenueCat (4.11.0)
   - shared_preferences_ios (0.0.1):
     - Flutter
   - TOCropViewController (2.6.1)
@@ -41,6 +47,7 @@ DEPENDENCIES:
   - in_app_purchase_storekit (from `.symlinks/plugins/in_app_purchase_storekit/ios`)
   - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+  - purchases_flutter (from `.symlinks/plugins/purchases_flutter/ios`)
   - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
   - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/ios`)
@@ -48,6 +55,8 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - OrderedSet
+    - PurchasesHybridCommon
+    - RevenueCat
     - TOCropViewController
 
 EXTERNAL SOURCES:
@@ -69,6 +78,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider_ios/ios"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
+  purchases_flutter:
+    :path: ".symlinks/plugins/purchases_flutter/ios"
   shared_preferences_ios:
     :path: ".symlinks/plugins/shared_preferences_ios/ios"
   url_launcher_ios:
@@ -87,6 +98,9 @@ SPEC CHECKSUMS:
   OrderedSet: aaeb196f7fef5a9edf55d89760da9176ad40b93c
   path_provider_ios: 14f3d2fd28c4fdb42f44e0f751d12861c43cee02
   permission_handler_apple: 44366e37eaf29454a1e7b1b7d736c2cceaeb17ce
+  purchases_flutter: 36a9044dd30c311b0cb17d81298706d4e6ad8079
+  PurchasesHybridCommon: 6365a748333fb82e2f4710f9e265fd229ba4c381
+  RevenueCat: daea606706c9d1a3182e89768bd80e664c49bce6
   shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
   TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
   url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
