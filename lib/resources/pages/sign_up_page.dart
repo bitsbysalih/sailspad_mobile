@@ -55,6 +55,10 @@ class _SignUpPageState extends NyState<SignUpPage> {
     'twitter',
     'website',
     'github',
+    'phone',
+    'whatsapp',
+    'tiktok',
+    'behance',
   ];
 
   IconData iconSelector(String iconName) {
@@ -70,6 +74,14 @@ class _SignUpPageState extends NyState<SignUpPage> {
       return FontAwesomeIcons.globe;
     } else if (iconName == 'github') {
       return FontAwesomeIcons.github;
+    } else if (iconName == 'phone') {
+      return FontAwesomeIcons.phone;
+    } else if (iconName == 'whatsapp') {
+      return FontAwesomeIcons.whatsapp;
+    } else if (iconName == 'tiktok') {
+      return FontAwesomeIcons.tiktok;
+    } else if (iconName == 'behance') {
+      return FontAwesomeIcons.behance;
     }
     return FontAwesomeIcons.a;
   }
