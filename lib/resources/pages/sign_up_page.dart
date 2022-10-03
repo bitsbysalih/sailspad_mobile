@@ -239,32 +239,34 @@ class _SignUpPageState extends NyState<SignUpPage> {
   }
 
   Widget initialSignUpView() {
-    return Container(
-      child: Form(
-        key: _signUpFormKey,
-        child: Column(
-          children: [
-            Text(
-              'Tell us about you!',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w300,
+    return SingleChildScrollView(
+      child: Container(
+        child: Form(
+          key: _signUpFormKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: Column(
+            children: [
+              Text(
+                'Tell us about you!',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w300,
+                ),
               ),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            ProfilePhotoInput(
-              onSelectImage: _selectProfileImage,
-            ),
-            Form(
-              child: Column(
+              SizedBox(
+                height: 30,
+              ),
+              ProfilePhotoInput(
+                onSelectImage: _selectProfileImage,
+              ),
+              Column(
                 children: [
                   AuthFormField(
                     label: 'First Name',
                     textInputType: TextInputType.name,
                     onChanged: (value) {
                       _signUpData['firstName'] = value;
+                      return null;
                     },
                   ),
                   AuthFormField(
@@ -272,6 +274,7 @@ class _SignUpPageState extends NyState<SignUpPage> {
                     textInputType: TextInputType.name,
                     onChanged: (value) {
                       _signUpData['lastName'] = value;
+                      return null;
                     },
                   ),
                   AuthFormField(
@@ -279,6 +282,7 @@ class _SignUpPageState extends NyState<SignUpPage> {
                     textInputType: TextInputType.text,
                     onChanged: (value) {
                       _signUpData['jobTitle'] = value;
+                      return null;
                     },
                   ),
                   AuthFormField(
@@ -286,13 +290,17 @@ class _SignUpPageState extends NyState<SignUpPage> {
                     textInputType: TextInputType.emailAddress,
                     onChanged: (value) {
                       _signUpData['email'] = value;
+                      return null;
                     },
                   ),
                   AuthFormField(
                     label: 'Password',
                     textInputType: TextInputType.visiblePassword,
                     onChanged: (value) {
-                      _signUpData['password'] = value;
+                      setState(() {
+                        _signUpData['password'] = value;
+                      });
+                      return null;
                     },
                     obscureText: true,
                   ),
@@ -300,39 +308,46 @@ class _SignUpPageState extends NyState<SignUpPage> {
                     label: 'Confirm Password',
                     textInputType: TextInputType.visiblePassword,
                     onChanged: (value) {
-                      _signUpData['confirmPassword'] = value;
+                      setState(() {
+                        _signUpData['confirmPassword'] = value;
+                      });
+                      return null;
                     },
                     obscureText: true,
                   ),
                 ],
               ),
-            ),
-            RoundedButton(
-              child: _isLoading
-                  ? SizedBox(
-                      child: CircularProgressIndicator(
-                        color: Colors.blue,
-                        strokeWidth: 2,
+              RoundedButton(
+                child: _isLoading
+                    ? SizedBox(
+                        child: CircularProgressIndicator(
+                          color: Colors.blue,
+                          strokeWidth: 2,
+                        ),
+                        height: 20.0,
+                        width: 20.0,
+                      )
+                    : Text(
+                        'Next',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 17,
+                        ),
                       ),
-                      height: 20.0,
-                      width: 20.0,
-                    )
-                  : Text(
-                      'Next',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 17,
-                      ),
-                    ),
-              onPressed: initialSignUp,
-            ),
-            TextButton(
-              onPressed: () {
-                routeTo('/sign-in-page');
-              },
-              child: Text('Already have an account?'),
-            )
-          ],
+                onPressed: () {
+                  if (_signUpFormKey.currentState!.validate()) {
+                    initialSignUp();
+                  }
+                },
+              ),
+              TextButton(
+                onPressed: () {
+                  routeTo('/sign-in-page');
+                },
+                child: Text('Already have an account?'),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -516,6 +531,7 @@ class _SignUpPageState extends NyState<SignUpPage> {
                                 },
                                 onChanged: (value) {
                                   e['link'] = value;
+                                  return null;
                                 },
                               ),
                             ),

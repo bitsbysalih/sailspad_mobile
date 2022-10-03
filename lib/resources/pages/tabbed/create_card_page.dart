@@ -315,7 +315,7 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
       bounce: true,
       context: context,
       builder: (context) => SizedBox(
-        height: 750,
+        height: mediaQuery.size.height * 0.9,
         child: InAppWebView(
           initialOptions: options,
           initialUrlRequest: URLRequest(

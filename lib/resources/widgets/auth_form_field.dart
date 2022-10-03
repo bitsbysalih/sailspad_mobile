@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AuthFormField extends StatefulWidget {
@@ -14,6 +15,7 @@ class AuthFormField extends StatefulWidget {
     this.textInputType = TextInputType.name,
     this.padding = 10,
     this.fontSize = 16,
+    this.inputFormatters,
   }) : super(key: key);
 
   final String label;
@@ -23,7 +25,9 @@ class AuthFormField extends StatefulWidget {
   final double padding;
   final double fontSize;
   final String Function(String?)? validator;
-  final Function(String?)? onChanged;
+  final String? Function(String?)? onChanged;
+  final List<TextInputFormatter>? inputFormatters;
+
   @override
   State<AuthFormField> createState() => _AuthFormFieldState();
 }
@@ -40,6 +44,7 @@ class _AuthFormFieldState extends State<AuthFormField> {
         onChanged: widget.onChanged,
         cursorColor: Colors.grey,
         style: TextStyle(fontSize: widget.fontSize),
+        inputFormatters: [],
         decoration: InputDecoration(
           suffixIcon: widget.textInputType == TextInputType.visiblePassword
               ? IconButton(
@@ -89,7 +94,7 @@ class _AuthFormFieldState extends State<AuthFormField> {
             borderRadius: BorderRadius.circular(50),
             borderSide: BorderSide(
               width: 1,
-              color: Colors.red,
+              color: Color(0xFFE3E3E3),
             ),
           ),
           errorBorder: OutlineInputBorder(

@@ -36,7 +36,6 @@ class _CardImageInputState extends NyState<CardImageInput> {
     return await ImageCropper().cropImage(
       sourcePath: filePath,
       aspectRatio: CropAspectRatio(ratioX: 1.0, ratioY: 1.0),
-      compressFormat: ImageCompressFormat.png,
       aspectRatioPresets: [CropAspectRatioPreset.square],
       uiSettings: [
         AndroidUiSettings(

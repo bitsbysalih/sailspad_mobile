@@ -67,12 +67,12 @@ class _CardListItemState extends NyState<CardListItem> {
     return showMaterialModalBottomSheet(
       context: context,
       builder: (context) => SizedBox(
-        height: 750,
+        height: mediaQuery.size.height * 0.9,
         child: InAppWebView(
           initialOptions: options,
           initialUrlRequest: URLRequest(
             url: Uri.parse(
-              'http://192.168.1.108:5173/card/${widget.id}/view',
+              'https://sailspad-card-viewer.vercel.app/card/${widget.id}/view',
             ),
           ),
         ),
@@ -86,12 +86,12 @@ class _CardListItemState extends NyState<CardListItem> {
     return showMaterialModalBottomSheet(
       context: context,
       builder: (context) => SizedBox(
-        height: 750,
+        height: mediaQuery.size.height * 0.9,
         child: InAppWebView(
           initialOptions: options,
           initialUrlRequest: URLRequest(
             url: Uri.parse(
-              'https://sailspad-card-viewer-bitsbysalih.vercel.app/cards/${widget.id}/qrcode',
+              'https://sailspad-card-viewer.vercel.app/card/${widget.id}/qr',
             ),
           ),
         ),

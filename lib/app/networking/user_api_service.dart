@@ -34,29 +34,23 @@ class UserApiService extends BaseApiService {
   ///Verify OTP
   Future<dynamic> verifyOtp({dynamic query}) async {
     return await network(
-      request: (request) => request.post(
-        "/auth/validate-email",
-        queryParameters: query,
-      ),
+      request: (request) =>
+          request.post("/auth/validate-email", queryParameters: query),
     );
   }
 
   ///Check email availability
   Future<dynamic> checkEmail({dynamic query}) async {
     return await network(
-      request: (request) => request.post(
-        "/auth/check-email",
-        queryParameters: query,
-      ),
+      request: (request) =>
+          request.post("/auth/check-email", queryParameters: query),
     );
   }
 
+  ///Add Contact Links to account
   Future<dynamic> addContactLinks({dynamic data}) async {
     return await network(
-      request: (request) => request.put(
-        "/user/",
-        data: data,
-      ),
+      request: (request) => request.put("/user/", data: data),
     );
   }
 
@@ -67,7 +61,7 @@ class UserApiService extends BaseApiService {
     );
   }
 
-  /// Find a User
+  ///Find a User
   Future<User?> find({required int id}) async {
     return await network<User>(
       request: (request) => request.get("/endpoint-path/$id"),
@@ -103,6 +97,7 @@ class UserApiService extends BaseApiService {
     );
   }
 
+  ///Displays Error message
   displayError(DioError dioError, BuildContext context) {
     showToastNotification(
       context,
