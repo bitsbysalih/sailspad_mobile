@@ -38,6 +38,7 @@ class CardListItem extends StatefulWidget {
 class _CardListItemState extends NyState<CardListItem> {
   // final Completer<WebViewController> _controller =
   //     Completer<WebViewController>();
+
   @override
   init() async {
     if (Platform.isAndroid) {
@@ -51,6 +52,7 @@ class _CardListItemState extends NyState<CardListItem> {
   InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
       crossPlatform: InAppWebViewOptions(
         useShouldOverrideUrlLoading: true,
+        allowFileAccessFromFileURLs: true,
         mediaPlaybackRequiresUserGesture: false,
       ),
       android: AndroidInAppWebViewOptions(
@@ -75,6 +77,11 @@ class _CardListItemState extends NyState<CardListItem> {
               'https://sailspad-card-viewer.vercel.app/card/${widget.id}/view',
             ),
           ),
+          androidOnPermissionRequest: (controller, origin, resources) async {
+            return PermissionRequestResponse(
+                resources: resources,
+                action: PermissionRequestResponseAction.GRANT);
+          },
         ),
       ),
       isDismissible: true,
