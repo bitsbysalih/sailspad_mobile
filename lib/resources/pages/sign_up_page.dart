@@ -9,12 +9,27 @@ import 'package:nylo_framework/nylo_framework.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:sailspad/app/networking/ar_card_api_service.dart';
 import 'package:sailspad/resources/widgets/profile_photo_input.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/controllers/sign_up_controller.dart';
 import '../../app/networking/user_api_service.dart';
 import '../../bootstrap/helpers.dart';
 import '../widgets/auth_form_field.dart';
 import '../widgets/rounded_button.dart';
+
+extension StringExtension on String {
+  int? toInt() {
+    return int.tryParse(this);
+  }
+
+  double? toDouble() {
+    return double.tryParse(this);
+  }
+
+  num? toNumber() {
+    return num.tryParse(this);
+  }
+}
 
 class SignUpPage extends NyStatefulWidget {
   final SignUpController controller = SignUpController();
@@ -28,13 +43,28 @@ class SignUpPage extends NyStatefulWidget {
 class _SignUpPageState extends NyState<SignUpPage> {
   final _signUpFormKey = GlobalKey<FormState>();
 
+  double total = 0;
+  double yearlyTotal = 0;
+
   int signUpStep = 1;
   bool _isLoading = false;
   File? _profilePhoto;
   final userContactLinks = [
-    {"name": "twitter", "link": "https://twitter.com/"},
+    {"name": "twitter", "link": ""},
   ];
   Timer? _debounce;
+
+  int? stringToInt_tryParse(String? input) {
+    return int.tryParse(input!);
+  }
+
+  double? stringToDouble_tryParse(String? input) {
+    return double.tryParse(input!);
+  }
+
+  num? stringToNumber_tryParse(String? input) {
+    return num.tryParse(input!);
+  }
 
   Map _signUpData = {
     'firstName': '',
@@ -46,6 +76,8 @@ class _SignUpPageState extends NyState<SignUpPage> {
     'profilePhoto': File,
     'otpToken': '',
     "links": [],
+    'yearly': false,
+    'cardSlots': int,
   };
 
   final List<String> items = [
@@ -217,15 +249,10 @@ class _SignUpPageState extends NyState<SignUpPage> {
     }
 
     await createCardFromSignUp();
+    moveToNext();
     setState(() {
       _isLoading = false;
     });
-    SchedulerBinding.instance.addPostFrameCallback(
-      (_) async {
-        Navigator.of(context).pushNamedAndRemoveUntil(
-            '/tabs-page', (Route<dynamic> route) => false);
-      },
-    );
   }
 
   Future<void> createCardFromSignUp() async {
@@ -248,6 +275,37 @@ class _SignUpPageState extends NyState<SignUpPage> {
         data: formData,
       ),
     );
+  }
+
+  Future<void> createPaymentIntent() async {
+    final response = await api<UserApiService>(
+      (request) => request.createPaymentIntent(
+        data: {
+          "cardSlots": _signUpData['cardSlots'].toString(),
+          'yearlySubscription': _signUpData['yearly'],
+        },
+      ),
+    );
+    if (response != null) {
+      final response = await api<UserApiService>(
+        (request) => request.createBilling(),
+      );
+      if (response != null) {
+        await launchUrl(
+          Uri.parse(
+            response['url'],
+          ),
+          mode: LaunchMode.platformDefault,
+        );
+        SchedulerBinding.instance.addPostFrameCallback(
+          (_) async {
+            Navigator.of(context).pushNamedAndRemoveUntil(
+                '/tabs-page', (Route<dynamic> route) => false);
+          },
+        );
+        print(response);
+      }
+    }
   }
 
   Widget initialSignUpView() {
@@ -619,6 +677,93 @@ class _SignUpPageState extends NyState<SignUpPage> {
     );
   }
 
+  Widget subscriptionView() {
+    return Container(
+      child: Column(
+        children: [
+          Text(
+            "\$${yearlyTotal ?? 0}/${_signUpData['yearly'] ? 'Y' : 'M'}",
+            style: TextStyle(
+              fontSize: 30,
+            ),
+          ),
+          Text('How many card slots do you need?'),
+          AuthFormField(
+            label: 'Card Slots',
+            onChanged: (value) {
+              double intValue = double.tryParse(value!) as double;
+
+              if (intValue >= 1 && intValue < 10) {
+                total = intValue * 2;
+                yearlyTotal = total;
+              } else if (intValue >= 10 && intValue < 50) {
+                total = intValue * 1.5;
+                yearlyTotal = total;
+              } else if (intValue >= 50 && intValue < 100) {
+                total = intValue * 1.2;
+                yearlyTotal = total;
+              } else if (intValue >= 100 && intValue < 200) {
+                total = intValue * 1.2;
+                yearlyTotal = total;
+              } else if (intValue >= 200) {
+                total = intValue;
+                yearlyTotal = total;
+              }
+              setState(() {
+                _signUpData['cardSlots'] = value;
+              });
+            },
+            textInputType: TextInputType.number,
+          ),
+          Container(
+            width: mediaQuery.size.width * 0.8,
+            child: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Checkbox(
+                    value: _signUpData['yearly'],
+                    onChanged: (value) {
+                      setState(() {
+                        _signUpData['yearly'] = value;
+                        if (value == true) {
+                          yearlyTotal = (total * 12 - ((total * 12) * 0.05));
+                        } else {
+                          yearlyTotal = total;
+                        }
+                      });
+                    }),
+                Text("Yearly Subscription at 5% off?")
+              ],
+            ),
+          ),
+          RoundedButton(
+            child: _isLoading
+                ? SizedBox(
+                    child: CircularProgressIndicator(
+                      color: Colors.blue,
+                      strokeWidth: 2,
+                    ),
+                    height: 20.0,
+                    width: 20.0,
+                  )
+                : Text(
+                    'Checkout',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 17,
+                    ),
+                  ),
+            onPressed: () {
+              if (double.parse(_signUpData['cardSlots']) > 0) {
+                createPaymentIntent();
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -642,6 +787,8 @@ class _SignUpPageState extends NyState<SignUpPage> {
                 emailVerification()
               else if (signUpStep == 3)
                 contactDetails()
+              else if (signUpStep == 4)
+                subscriptionView()
             ],
           ),
         ),

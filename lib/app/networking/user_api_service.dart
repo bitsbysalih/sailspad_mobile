@@ -97,12 +97,25 @@ class UserApiService extends BaseApiService {
     );
   }
 
+  Future<dynamic> createPaymentIntent({dynamic data}) async {
+    return await network(
+      request: (request) =>
+          request.post("/stripe/create-payment-intent", data: data),
+    );
+  }
+
+  Future<dynamic> createBilling() async {
+    return await network(
+      request: (request) => request.get("/stripe/create-billing"),
+    );
+  }
+
   ///Displays Error message
   displayError(DioError dioError, BuildContext context) {
     showToastNotification(
       context,
       title: 'Error',
-      description: dioError.response?.data['message'],
+      description: dioError?.response?.data?['message'],
       style: ToastNotificationStyleType.DANGER,
     );
   }

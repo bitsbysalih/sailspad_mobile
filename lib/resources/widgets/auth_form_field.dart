@@ -38,6 +38,7 @@ class _AuthFormFieldState extends State<AuthFormField> {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       child: TextFormField(
+        keyboardType: widget.textInputType,
         initialValue: widget.initialValue,
         validator: widget.validator,
         obscureText: widget.obscureText,

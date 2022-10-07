@@ -247,7 +247,15 @@ class _SettingsPageState extends NyState<SettingsPage> {
                   SettingsButton(
                     label: 'Subscriptions',
                     icon: FontAwesomeIcons.creditCard,
-                    onPressed: () {},
+                    onPressed: () {
+                      routeTo(
+                        '/settings-page/subscription',
+                        data: {
+                          'email': _userDetails['email'],
+                          "cardSlots": _userDetails['cardSlots'],
+                        },
+                      );
+                    },
                   ),
                   SettingsButton(
                     label: 'Security',

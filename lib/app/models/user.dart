@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 class User {
   String? id;
   String? firstName;
@@ -9,6 +8,8 @@ class User {
   String? profilePhoto;
   String? accessToken;
   String? refreshToken;
+  String? monthlySubscriptionStatus;
+  String? subscriptionTier;
 
   User({
     this.id,
@@ -20,6 +21,8 @@ class User {
     this.profilePhoto,
     this.accessToken,
     this.refreshToken,
+    this.monthlySubscriptionStatus,
+    this.subscriptionTier,
   });
 
   User.fromJson(dynamic data) {
@@ -32,6 +35,8 @@ class User {
     profilePhoto = data['profilePhoto'];
     accessToken = data['accessToken'];
     refreshToken = data['refreshToken'];
+    monthlySubscriptionStatus = data['monthlySubscriptionStatus'];
+    subscriptionTier = data['subscriptionTier'];
   }
 
   toJson() => {
@@ -44,5 +49,7 @@ class User {
         'profilePhoto': profilePhoto,
         'accessToken': accessToken,
         'refreshToken': refreshToken,
+        'monthlySubscriptionStatus': monthlySubscriptionStatus,
+        'subscriptionTier': subscriptionTier,
       };
 }

@@ -428,20 +428,6 @@ class _SecuritySettingsPageState extends NyState<SecuritySettingsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(userDetails['email']),
-                      Wrap(
-                        children: [
-                          Text('Personal (Monthly)'),
-                          SizedBox(
-                            width: 2,
-                          ),
-                          Wrap(
-                            children: [
-                              Text(userDetails["cardSlots"].toString()),
-                              Text(' cards'),
-                            ],
-                          )
-                        ],
-                      )
                     ],
                   ),
                 ],
@@ -490,3 +476,18 @@ class _SecuritySettingsPageState extends NyState<SecuritySettingsPage> {
     );
   }
 }
+
+// Wrap(
+//                         children: [
+//                           Text('Personal (Monthly)'),
+//                           SizedBox(
+//                             width: 2,
+//                           ),
+//                           Wrap(
+//                             children: [
+//                               Text(userDetails["cardSlots"].toString()),
+//                               Text(' cards'),
+//                             ],
+//                           )
+//                         ],
+                      // )

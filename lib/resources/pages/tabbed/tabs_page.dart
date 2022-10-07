@@ -30,7 +30,8 @@ class _TabsPageState extends NyState<TabsPage> {
     'profilePhoto': '',
     "jobTitle": '',
     "cardSlots": int,
-    'availableCardSlots': int
+    'availableCardSlots': int,
+    'monthlySubscriptionStatus': "",
   };
 
   int _selectedPageIndex = 0;
@@ -178,7 +179,6 @@ class _TabsPageState extends NyState<TabsPage> {
               bottom: BorderSide(
                 width: 0.2,
                 // color: Color(0xFF455154),
-                color: Colors.red,
               ),
             ),
             image: DecorationImage(
@@ -191,56 +191,62 @@ class _TabsPageState extends NyState<TabsPage> {
           child: pages[_selectedPageIndex]['page'] as Widget,
         ),
         extendBody: true,
-        bottomNavigationBar: DotNavigationBar(
-          borderRadius: 50,
-          enableFloatingNavBar: true,
-          itemPadding: EdgeInsets.only(top: 2, bottom: 2),
-          marginR: EdgeInsets.only(
-              right: 25, left: 25, bottom: Platform.isAndroid ? 45 : 0),
-          paddingR: EdgeInsets.only(right: 25, left: 25, top: 15),
-          enablePaddingAnimation: false,
-          dotIndicatorColor: Colors.transparent,
-          backgroundColor: Color(0xFFE4E9EA).withOpacity(0.5),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              spreadRadius: -10,
-              blurRadius: 20,
-              offset: Offset(0, 10),
-            )
-          ],
-          currentIndex: _selectedPageIndex,
-          onTap: _selectPage,
-          items: [
-            //Home
-            DotNavigationBarItem(
-              icon: Icon(SailspadIcons.home_icon),
-              selectedColor: Color(0xFF455154),
-              unselectedColor: Color(0xFF637579),
-            ),
+        bottomNavigationBar:
+            _userDetails['monthlySubscriptionStatus'] == 'active' ||
+                    _userDetails['monthlySubscriptionStatus'] == 'trialing'
+                ? DotNavigationBar(
+                    borderRadius: 50,
+                    enableFloatingNavBar: true,
+                    itemPadding: EdgeInsets.only(top: 2, bottom: 2),
+                    marginR: EdgeInsets.only(
+                        right: 25,
+                        left: 25,
+                        bottom: Platform.isAndroid ? 45 : 0),
+                    paddingR: EdgeInsets.only(right: 25, left: 25, top: 15),
+                    enablePaddingAnimation: false,
+                    dotIndicatorColor: Colors.transparent,
+                    backgroundColor: Color(0xFFE4E9EA).withOpacity(0.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        spreadRadius: -10,
+                        blurRadius: 20,
+                        offset: Offset(0, 10),
+                      )
+                    ],
+                    currentIndex: _selectedPageIndex,
+                    onTap: _selectPage,
+                    items: [
+                      //Home
+                      DotNavigationBarItem(
+                        icon: Icon(SailspadIcons.home_icon),
+                        selectedColor: Color(0xFF455154),
+                        unselectedColor: Color(0xFF637579),
+                      ),
 
-            //Analytics
-            DotNavigationBarItem(
-              icon: Icon(SailspadIcons.stats_icon),
-              selectedColor: Color(0xFF455154),
-              unselectedColor: Color(0xFF637579),
-            ),
+                      //Analytics
+                      DotNavigationBarItem(
+                        icon: Icon(SailspadIcons.stats_icon),
+                        selectedColor: Color(0xFF455154),
+                        unselectedColor: Color(0xFF637579),
+                      ),
 
-            //User Profile
-            DotNavigationBarItem(
-              icon: Icon(SailspadIcons.user_icon),
-              selectedColor: Color(0xFF455154),
-              unselectedColor: Color(0xFF637579),
-            ),
+                      //User Profile
+                      DotNavigationBarItem(
+                        icon: Icon(SailspadIcons.user_icon),
+                        selectedColor: Color(0xFF455154),
+                        unselectedColor: Color(0xFF637579),
+                      ),
 
-            //Create New Card
-            DotNavigationBarItem(
-              icon: FaIcon(FontAwesomeIcons.circlePlus),
-              selectedColor: Color(0xFF455154),
-              unselectedColor: Color(0xFF637579),
-            ),
-          ],
-        ),
+                      //Create New Card
+                      DotNavigationBarItem(
+                        icon: FaIcon(FontAwesomeIcons.circlePlus),
+                        selectedColor: Color(0xFF455154),
+                        unselectedColor: Color(0xFF637579),
+                      ),
+                    ],
+                  )
+                : null,
       ),
     );
   }
