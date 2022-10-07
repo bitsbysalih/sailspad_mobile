@@ -46,7 +46,7 @@ class _SignUpPageState extends NyState<SignUpPage> {
   double total = 0;
   double yearlyTotal = 0;
 
-  int signUpStep = 1;
+  int signUpStep = 4;
   bool _isLoading = false;
   File? _profilePhoto;
   final userContactLinks = [
@@ -691,7 +691,7 @@ class _SignUpPageState extends NyState<SignUpPage> {
           AuthFormField(
             label: 'Card Slots',
             onChanged: (value) {
-              double intValue = double.tryParse(value!) as double;
+              double intValue = double.tryParse(value as String) ?? 0.0;
 
               if (intValue >= 1 && intValue < 10) {
                 total = intValue * 2;
