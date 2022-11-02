@@ -15,9 +15,6 @@ class SettingsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      // style: TextButton.styleFrom(
-      //   side: BorderSide(strokeAlign: ),
-      // ),
       onPressed: onPressed,
       child: Row(
         children: [

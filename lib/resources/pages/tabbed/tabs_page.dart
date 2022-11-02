@@ -193,7 +193,8 @@ class _TabsPageState extends NyState<TabsPage> {
         extendBody: true,
         bottomNavigationBar:
             _userDetails['monthlySubscriptionStatus'] == 'active' ||
-                    _userDetails['monthlySubscriptionStatus'] == 'trialing'
+                    _userDetails['monthlySubscriptionStatus'] == 'trialing' ||
+                    _userDetails['monthlySubscriptionStatus'] == 'success'
                 ? DotNavigationBar(
                     borderRadius: 50,
                     enableFloatingNavBar: true,

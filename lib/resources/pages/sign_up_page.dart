@@ -46,7 +46,7 @@ class _SignUpPageState extends NyState<SignUpPage> {
   double total = 0;
   double yearlyTotal = 0;
 
-  int signUpStep = 4;
+  int signUpStep = 1;
   bool _isLoading = false;
   File? _profilePhoto;
   final userContactLinks = [
@@ -682,7 +682,7 @@ class _SignUpPageState extends NyState<SignUpPage> {
       child: Column(
         children: [
           Text(
-            "\$${yearlyTotal ?? 0}/${_signUpData['yearly'] ? 'Y' : 'M'}",
+            "\$${yearlyTotal}/${_signUpData['yearly'] ? 'Y' : 'M'}",
             style: TextStyle(
               fontSize: 30,
             ),
@@ -693,7 +693,10 @@ class _SignUpPageState extends NyState<SignUpPage> {
             onChanged: (value) {
               double intValue = double.tryParse(value as String) ?? 0.0;
 
-              if (intValue >= 1 && intValue < 10) {
+              if (intValue == 0) {
+                total = 0;
+                yearlyTotal = total;
+              } else if (intValue >= 1 && intValue < 10) {
                 total = intValue * 2;
                 yearlyTotal = total;
               } else if (intValue >= 10 && intValue < 50) {
