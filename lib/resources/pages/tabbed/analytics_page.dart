@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
+import 'package:sailspad/resources/widgets/analytics_card.dart';
 import '../../../app/controllers/controller.dart';
+import '../../../app/networking/ar_card_api_service.dart';
+import '../../../bootstrap/helpers.dart';
 
 class AnalyticsPage extends NyStatefulWidget {
   final Controller controller = Controller();
@@ -11,12 +14,34 @@ class AnalyticsPage extends NyStatefulWidget {
 }
 
 class _AnalyticsPageState extends NyState<AnalyticsPage> {
+  bool _isLoading = false;
+  List loadedCards = [];
+
   @override
-  init() async {}
+  init() async {
+    await loadCards();
+  }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Future<void> loadCards() async {
+    setState(() {
+      _isLoading = true;
+    });
+    final response = await api<ArCardApiService>(
+      (request) => request.fetchAll(),
+    );
+    if (response != null) {
+      setState(() {
+        loadedCards = response;
+      });
+    }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -35,18 +60,20 @@ class _AnalyticsPageState extends NyState<AnalyticsPage> {
         height: mediaQuery.size.height * 0.735,
         width: mediaQuery.size.width,
         padding: EdgeInsets.only(
-          left: 30,
-          right: 30,
+          left: 20,
+          right: 20,
         ),
-        child: Center(
-          child: Text(
-            "We're working hard to get this Feature ready",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+        child: PageView.builder(
+          itemBuilder: (ctx, i) {
+            return AnalyticsCard(
+              id: loadedCards[i]!.id,
+              name: loadedCards[i]!.name,
+              title: loadedCards[i]!.title,
+              uniqueId: loadedCards[i]!.uniqueId,
+              cardImage: loadedCards[i]!.cardImage,
+            );
+          },
+          itemCount: loadedCards.length,
         ),
       ),
     );

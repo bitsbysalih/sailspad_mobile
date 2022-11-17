@@ -67,21 +67,28 @@ class _CardListItemState extends NyState<CardListItem> {
 
   Future<dynamic> _showARBottomSheet(BuildContext context) {
     return showMaterialModalBottomSheet(
+      backgroundColor: Colors.transparent,
       context: context,
-      builder: (context) => SizedBox(
-        height: mediaQuery.size.height * 0.9,
-        child: InAppWebView(
-          initialOptions: options,
-          initialUrlRequest: URLRequest(
-            url: Uri.parse(
-              'https://sailspad-card-viewer.vercel.app/card/${widget.id}/view',
+      builder: (context) => ClipRRect(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+        child: Container(
+          height: mediaQuery.size.height * 0.92,
+          child: InAppWebView(
+            initialOptions: options,
+            initialUrlRequest: URLRequest(
+              url: Uri.parse(
+                'https://sailspad-card-viewer.vercel.app/card/${widget.id}/view-mobile',
+              ),
             ),
+            androidOnPermissionRequest: (controller, origin, resources) async {
+              return PermissionRequestResponse(
+                  resources: resources,
+                  action: PermissionRequestResponseAction.GRANT);
+            },
           ),
-          androidOnPermissionRequest: (controller, origin, resources) async {
-            return PermissionRequestResponse(
-                resources: resources,
-                action: PermissionRequestResponseAction.GRANT);
-          },
         ),
       ),
       isDismissible: true,
@@ -91,14 +98,21 @@ class _CardListItemState extends NyState<CardListItem> {
 
   Future<dynamic> _showQRBottomSheet(BuildContext context) {
     return showMaterialModalBottomSheet(
+      backgroundColor: Colors.transparent,
       context: context,
-      builder: (context) => SizedBox(
-        height: mediaQuery.size.height * 0.9,
-        child: InAppWebView(
-          initialOptions: options,
-          initialUrlRequest: URLRequest(
-            url: Uri.parse(
-              'https://sailspad-card-viewer.vercel.app/card/${widget.id}/qr',
+      builder: (context) => ClipRRect(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+        child: Container(
+          height: mediaQuery.size.height * 0.92,
+          child: InAppWebView(
+            initialOptions: options,
+            initialUrlRequest: URLRequest(
+              url: Uri.parse(
+                'https://sailspad-card-viewer.vercel.app/card/${widget.id}/qr',
+              ),
             ),
           ),
         ),

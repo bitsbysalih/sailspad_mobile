@@ -8,6 +8,7 @@ class SettingsButton extends StatelessWidget {
     required this.icon,
     required this.onPressed,
   }) : super(key: key);
+
   final String label;
   final VoidCallback onPressed;
   final IconData icon;
