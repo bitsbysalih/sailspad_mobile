@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_echarts/flutter_echarts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:sailspad/resources/widgets/daily_analytics_bar_chart.dart';
 
 import '../../app/networking/ar_card_api_service.dart';
 import '../../bootstrap/helpers.dart';
@@ -35,6 +33,7 @@ class _AnalyticsCardState extends NyState<AnalyticsCard> {
     'months': [],
     'days': [],
     'totalVisits': 0,
+    'totalDailyVisits': 0,
     'linksTotal': 0,
   };
 
@@ -224,6 +223,7 @@ class _AnalyticsCardState extends NyState<AnalyticsCard> {
                     child: monthlyStats['days'].length > 0
                         ? DailyStatsChart(
                             dailyStats: monthlyStats['days'],
+                            totalDailyVisits: monthlyStats['totalDailyVisits'],
                           )
                         : null,
                   ),
@@ -313,6 +313,7 @@ class _AnalyticsCardState extends NyState<AnalyticsCard> {
                 child: monthlyStats['months'].length > 0
                     ? YearlyStatsChart(
                         monthlyStats: monthlyStats['months'],
+                        totalYearlyVisits: monthlyStats['totalVisits'],
                       )
                     : null,
               )

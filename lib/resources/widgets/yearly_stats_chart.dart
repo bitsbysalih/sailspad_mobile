@@ -5,9 +5,14 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class YearlyStatsChart extends StatefulWidget {
-  const YearlyStatsChart({super.key, required this.monthlyStats});
+  const YearlyStatsChart({
+    super.key,
+    required this.monthlyStats,
+    required this.totalYearlyVisits,
+  });
 
   final List monthlyStats;
+  final int totalYearlyVisits;
 
   List<Color> get availableColors => const <Color>[
         Colors.purpleAccent,
@@ -44,24 +49,40 @@ class YearlyStatsChartState extends State<YearlyStatsChart> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  const Text(
-                    'Visitor\s insight',
-                    style: TextStyle(
-                      color: Color(0xFF455154),
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 4,
-                  ),
-                  const Text(
-                    'Monthly visits to your site',
-                    style: TextStyle(
-                      color: Color(0xFF455154),
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Visitor\s insight',
+                            style: TextStyle(
+                              color: Color(0xFF455154),
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          const Text(
+                            'Monthly visits to your site',
+                            style: TextStyle(
+                              color: Color(0xFF455154),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        widget.totalYearlyVisits.toString(),
+                        style: TextStyle(
+                          fontSize: 40,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(
                     height: 38,

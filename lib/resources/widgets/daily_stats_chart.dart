@@ -5,9 +5,14 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class DailyStatsChart extends StatefulWidget {
-  const DailyStatsChart({super.key, required this.dailyStats});
+  DailyStatsChart({
+    super.key,
+    required this.dailyStats,
+    required this.totalDailyVisits,
+  });
 
   final List dailyStats;
+  final int totalDailyVisits;
 
   @override
   State<StatefulWidget> createState() => DailyStatsChartState();
@@ -42,6 +47,13 @@ class DailyStatsChartState extends State<DailyStatsChart> {
                       color: Color(0xFF455154),
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    widget.totalDailyVisits.toString(),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 40,
                     ),
                   ),
                   const SizedBox(
