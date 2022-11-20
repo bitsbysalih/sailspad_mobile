@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_echarts/flutter_echarts.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:sailspad/resources/widgets/daily_analytics_bar_chart.dart';
 
 import '../../app/networking/ar_card_api_service.dart';
 import '../../bootstrap/helpers.dart';
-import 'analytics_bar_chart.dart';
+import 'daily_stats_chart.dart';
+import 'yearly_stats_chart.dart';
 
 class AnalyticsCard extends StatefulWidget {
   const AnalyticsCard({
@@ -27,12 +31,48 @@ class AnalyticsCard extends StatefulWidget {
 }
 
 class _AnalyticsCardState extends NyState<AnalyticsCard> {
-  List monthlyStats = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  Map monthlyStats = {
+    'months': [],
+    'days': [],
+    'totalVisits': 0,
+    'linksTotal': 0,
+  };
+
+  List linksData = [];
+
+  final List<String> items = [
+    'instagram',
+    'facebook',
+    'linkedin',
+    'twitter',
+    'website',
+    'github',
+  ];
+
+  double interactionPercentage = 0;
+
+  IconData iconSelector(String iconName) {
+    if (iconName == 'instagram') {
+      return FontAwesomeIcons.instagram;
+    } else if (iconName == 'twitter') {
+      return FontAwesomeIcons.twitter;
+    } else if (iconName == 'facebook') {
+      return FontAwesomeIcons.facebook;
+    } else if (iconName == 'linkedin') {
+      return FontAwesomeIcons.linkedin;
+    } else if (iconName == 'website') {
+      return FontAwesomeIcons.globe;
+    } else if (iconName == 'github') {
+      return FontAwesomeIcons.github;
+    }
+    return FontAwesomeIcons.a;
+  }
 
   bool _isLoading = false;
   @override
   init() async {
     await loadData();
+    await loadLinksData();
   }
 
   @override
@@ -52,11 +92,30 @@ class _AnalyticsCardState extends NyState<AnalyticsCard> {
     if (response != null) {
       setState(() {
         monthlyStats = response;
+        interactionPercentage =
+            (monthlyStats['linksTotal'] / monthlyStats['totalVisits']) * 100;
       });
     }
-    // setState(() {
-    //   _isLoading = false;
-    // });
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<void> loadLinksData() async {
+    setState(() {
+      _isLoading = true;
+    });
+    final response = await api<ArCardApiService>(
+      (request) => request.getLinksAnalyticsData(id: widget.id),
+    );
+    if (response != null) {
+      setState(() {
+        linksData = response;
+      });
+    }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -68,7 +127,10 @@ class _AnalyticsCardState extends NyState<AnalyticsCard> {
             vertical: 20,
             horizontal: 5,
           ),
-          decoration: BoxDecoration(color: Color(0xFFE4E9EA)),
+          decoration: BoxDecoration(
+            color: Color(0xFFE4E9EA),
+            borderRadius: BorderRadius.circular(15),
+          ),
           padding: EdgeInsets.symmetric(
             horizontal: 10,
             vertical: 20,
@@ -126,6 +188,29 @@ class _AnalyticsCardState extends NyState<AnalyticsCard> {
                   ],
                 ),
               ),
+              if (linksData.length > 0)
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 20),
+                  child: Wrap(
+                    runAlignment: WrapAlignment.spaceBetween,
+                    spacing: 50,
+
+                    // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: linksData.map((e) {
+                      return Container(
+                        child: Column(
+                          children: [
+                            FaIcon(
+                              iconSelector(e['linkName']),
+                              size: 30,
+                            ),
+                            Text(e['count'].toString()),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -136,6 +221,11 @@ class _AnalyticsCardState extends NyState<AnalyticsCard> {
                     ),
                     width: 150,
                     height: 300,
+                    child: monthlyStats['days'].length > 0
+                        ? DailyStatsChart(
+                            dailyStats: monthlyStats['days'],
+                          )
+                        : null,
                   ),
                   Container(
                     decoration: BoxDecoration(
@@ -162,7 +252,7 @@ class _AnalyticsCardState extends NyState<AnalyticsCard> {
                           ),
                         ),
                         Text(
-                          '86.5% of visitors interact with your profile',
+                          '${interactionPercentage.toStringAsFixed(1)}% of visitors interact with your profile',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 12,
@@ -177,7 +267,7 @@ class _AnalyticsCardState extends NyState<AnalyticsCard> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                monthlyStats[10].toString(),
+                                monthlyStats['totalVisits'].toString(),
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 22.0,
@@ -220,8 +310,12 @@ class _AnalyticsCardState extends NyState<AnalyticsCard> {
                 ),
                 width: double.infinity,
                 height: 300,
-                child: AnalyticsBarChart(monthlyStats: monthlyStats),
-              ),
+                child: monthlyStats['months'].length > 0
+                    ? YearlyStatsChart(
+                        monthlyStats: monthlyStats['months'],
+                      )
+                    : null,
+              )
             ],
           ),
         ),

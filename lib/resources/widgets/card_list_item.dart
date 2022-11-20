@@ -38,6 +38,7 @@ class CardListItem extends StatefulWidget {
 class _CardListItemState extends NyState<CardListItem> {
   // final Completer<WebViewController> _controller =
   //     Completer<WebViewController>();
+  String get webClientUrl => getEnv('WEB_CLIENT_URL');
 
   @override
   init() async {
@@ -80,7 +81,7 @@ class _CardListItemState extends NyState<CardListItem> {
             initialOptions: options,
             initialUrlRequest: URLRequest(
               url: Uri.parse(
-                'https://sailspad-card-viewer.vercel.app/card/${widget.id}/view-mobile',
+                '$webClientUrl/${widget.id}/view-mobile',
               ),
             ),
             androidOnPermissionRequest: (controller, origin, resources) async {
@@ -111,7 +112,7 @@ class _CardListItemState extends NyState<CardListItem> {
             initialOptions: options,
             initialUrlRequest: URLRequest(
               url: Uri.parse(
-                'https://sailspad-card-viewer.vercel.app/card/${widget.id}/qr',
+                '$webClientUrl/${widget.id}/qr',
               ),
             ),
           ),

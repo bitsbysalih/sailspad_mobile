@@ -37,6 +37,7 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
   bool editMode = false;
   bool _isLoadingCard = true;
   String token = '';
+  String webClientUrl = getEnv('WEB_CLIENT_URL');
 
   List cardLinks = [
     {"name": "instagram", "link": ""},
@@ -334,7 +335,7 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
             iosAllowsCellularAccess: true,
             iosAllowsExpensiveNetworkAccess: true,
             url: Uri.parse(
-              'https://sailspad-client-dev.vercel.app/mobile-marker-upload/$token',
+              '$webClientUrl/mobile-marker-upload/$token',
             ),
           ),
         ),

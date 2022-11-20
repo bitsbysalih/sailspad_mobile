@@ -47,6 +47,14 @@ class ArCardApiService extends BaseApiService {
     );
   }
 
+  Future<dynamic> getLinksAnalyticsData({required String id}) async {
+    return await network(
+      request: (request) => request.get(
+        "/card/link-clicks/$id",
+      ),
+    );
+  }
+
   /// Update a ArCard
   Future<ArCard?> update({dynamic data, String, id}) async {
     return await network<ArCard>(
