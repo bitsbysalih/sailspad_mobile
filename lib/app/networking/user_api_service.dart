@@ -115,7 +115,7 @@ class UserApiService extends BaseApiService {
     showToastNotification(
       context,
       title: 'Error',
-      description: dioError?.response?.data?['message'],
+      description: dioError.response?.data?['message'],
       style: ToastNotificationStyleType.DANGER,
     );
   }
