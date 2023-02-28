@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -67,16 +68,22 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
   };
 
   final List<String> items = [
-    'instagram',
     'facebook',
+    'instagram',
     'linkedin',
     'twitter',
+    'telegram',
+    'pinterest',
+    'reddit',
+    'discord',
+    'behance',
+    'snapchat',
+    'tiktok',
+    'whatsapp',
+    'phone',
+    'email',
     'website',
     'github',
-    'phone',
-    'whatsapp',
-    'tiktok',
-    'behance',
   ];
 
   IconData iconSelector(String iconName) {
@@ -100,6 +107,18 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
       return FontAwesomeIcons.tiktok;
     } else if (iconName == 'behance') {
       return FontAwesomeIcons.behance;
+    } else if (iconName == 'telegram') {
+      return FontAwesomeIcons.telegram;
+    } else if (iconName == 'pinterest') {
+      return FontAwesomeIcons.pinterest;
+    } else if (iconName == 'reddit') {
+      return FontAwesomeIcons.reddit;
+    } else if (iconName == 'discord') {
+      return FontAwesomeIcons.discord;
+    } else if (iconName == 'snapchat') {
+      return FontAwesomeIcons.snapchat;
+    } else if (iconName == 'email') {
+      return FontAwesomeIcons.envelope;
     }
     return FontAwesomeIcons.a;
   }
@@ -412,6 +431,7 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                           fontSize: 12,
                                           onChanged: (value) {
                                             _cardData['name'] = value;
+                                            return null;
                                           },
                                         ),
                                         AuthFormField(
@@ -421,6 +441,7 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                           fontSize: 12,
                                           onChanged: (value) {
                                             _cardData['title'] = value;
+                                            return null;
                                           },
                                         ),
                                       ],
@@ -487,6 +508,7 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                         fontSize: 12,
                                         onChanged: (value) {
                                           _cardData['shortName'] = value;
+                                          return null;
                                         },
                                       ),
                                     )
@@ -654,6 +676,7 @@ class _CreateCardPageState extends NyState<CreateCardPage> {
                                                     },
                                                     onChanged: (value) {
                                                       e['link'] = value;
+                                                      return null;
                                                     },
                                                   ),
                                                 ),

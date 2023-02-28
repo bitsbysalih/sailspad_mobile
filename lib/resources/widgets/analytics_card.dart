@@ -63,11 +63,30 @@ class _AnalyticsCardState extends NyState<AnalyticsCard> {
       return FontAwesomeIcons.globe;
     } else if (iconName == 'github') {
       return FontAwesomeIcons.github;
+    } else if (iconName == 'phone') {
+      return FontAwesomeIcons.phone;
+    } else if (iconName == 'whatsapp') {
+      return FontAwesomeIcons.whatsapp;
+    } else if (iconName == 'tiktok') {
+      return FontAwesomeIcons.tiktok;
+    } else if (iconName == 'behance') {
+      return FontAwesomeIcons.behance;
+    } else if (iconName == 'telegram') {
+      return FontAwesomeIcons.telegram;
+    } else if (iconName == 'pinterest') {
+      return FontAwesomeIcons.pinterest;
+    } else if (iconName == 'reddit') {
+      return FontAwesomeIcons.reddit;
+    } else if (iconName == 'discord') {
+      return FontAwesomeIcons.discord;
+    } else if (iconName == 'snapchat') {
+      return FontAwesomeIcons.snapchat;
+    } else if (iconName == 'email') {
+      return FontAwesomeIcons.envelope;
     }
     return FontAwesomeIcons.a;
   }
 
-  bool _isLoading = false;
   @override
   init() async {
     await loadData();
@@ -80,9 +99,7 @@ class _AnalyticsCardState extends NyState<AnalyticsCard> {
   }
 
   Future<void> loadData() async {
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() {});
     final response = await api<ArCardApiService>(
       (request) => request.getAnalyticsData(data: {
         "id": widget.id,
@@ -95,15 +112,11 @@ class _AnalyticsCardState extends NyState<AnalyticsCard> {
             (monthlyStats['linksTotal'] / monthlyStats['totalVisits']) * 100;
       });
     }
-    setState(() {
-      _isLoading = false;
-    });
+    setState(() {});
   }
 
   Future<void> loadLinksData() async {
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() {});
     final response = await api<ArCardApiService>(
       (request) => request.getLinksAnalyticsData(id: widget.id),
     );
@@ -112,9 +125,7 @@ class _AnalyticsCardState extends NyState<AnalyticsCard> {
         linksData = response;
       });
     }
-    setState(() {
-      _isLoading = false;
-    });
+    setState(() {});
   }
 
   @override

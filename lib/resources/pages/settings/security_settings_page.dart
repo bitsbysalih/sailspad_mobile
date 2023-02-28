@@ -187,6 +187,7 @@ class _SecuritySettingsPageState extends NyState<SecuritySettingsPage> {
             initialValue: newPassword,
             onChanged: (value) {
               newPassword = value as String;
+              return null;
             },
           ),
           // AuthFormField(label: 'Confirm Password'),
@@ -211,6 +212,7 @@ class _SecuritySettingsPageState extends NyState<SecuritySettingsPage> {
             initialValue: newEmail,
             onChanged: (value) {
               newEmail = value as String;
+              return null;
             },
           ),
           RoundedButton(
@@ -476,18 +478,3 @@ class _SecuritySettingsPageState extends NyState<SecuritySettingsPage> {
     );
   }
 }
-
-// Wrap(
-//                         children: [
-//                           Text('Personal (Monthly)'),
-//                           SizedBox(
-//                             width: 2,
-//                           ),
-//                           Wrap(
-//                             children: [
-//                               Text(userDetails["cardSlots"].toString()),
-//                               Text(' cards'),
-//                             ],
-//                           )
-//                         ],
-                      // )

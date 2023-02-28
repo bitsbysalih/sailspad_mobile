@@ -5,7 +5,6 @@ import 'package:sailspad/app/networking/ar_card_api_service.dart';
 import 'package:sailspad/resources/widgets/profile_photo_input.dart';
 
 import '../../../app/controllers/controller.dart';
-import '../../../app/networking/user_api_service.dart';
 import '../../../bootstrap/helpers.dart';
 
 class ProfilePage extends NyStatefulWidget {

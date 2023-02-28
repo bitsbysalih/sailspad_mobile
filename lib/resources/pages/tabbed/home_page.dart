@@ -75,9 +75,10 @@ class _HomePageState extends NyState<HomePage> {
   Future<bool> checkSubscriptionStatus() async {
     final response =
         await api<UserApiService>((request) => request.getuserDetails());
-    if (response['monthlySubscriptionStatus'] == "active" ||
+    if (response['monthlySubscriptionStatus'] == 'active' ||
         response['monthlySubscriptionStatus'] == 'trialing' ||
-        response['monthlySubscriptionStatus'] == 'unpaid') {
+        response['monthlySubscriptionStatus'] == 'success' ||
+        response['monthlySubscriptionStatus'] == 'succeeded') {
       setState(() {
         showModal = false;
       });
@@ -169,9 +170,11 @@ class _HomePageState extends NyState<HomePage> {
                       ),
                       RoundedButton(
                         onPressed: () {
-                          routeTo('/settings-page/subscription');
+                          routeTo(
+                            '/settings-page',
+                          );
                         },
-                        child: Text('Go to billing'),
+                        child: Text('Go to settings'),
                       ),
                     ],
                   ),

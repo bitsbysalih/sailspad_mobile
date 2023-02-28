@@ -715,6 +715,7 @@ class _SignUpPageState extends NyState<SignUpPage> {
               setState(() {
                 _signUpData['cardSlots'] = value;
               });
+              return null;
             },
             textInputType: TextInputType.number,
           ),

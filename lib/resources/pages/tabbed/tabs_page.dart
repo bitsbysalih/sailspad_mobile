@@ -29,8 +29,8 @@ class _TabsPageState extends NyState<TabsPage> {
     "lastName": "",
     'profilePhoto': '',
     "jobTitle": '',
-    "cardSlots": int,
-    'availableCardSlots': int,
+    "cardSlots": 0,
+    'availableCardSlots': 0,
     'monthlySubscriptionStatus': "",
   };
 
@@ -120,12 +120,11 @@ class _TabsPageState extends NyState<TabsPage> {
                           borderRadius: BorderRadius.circular(54),
                         ),
                         child: CircleAvatar(
-                          backgroundImage:
-                              _userDetails['profilePhoto'].isNotEmpty
-                                  ? NetworkImage(_userDetails['profilePhoto']!)
-                                      as ImageProvider
-                                  : AssetImage(
-                                      'public/assets/images/nylo_logo.png'),
+                          backgroundImage: _userDetails['profilePhoto'] != null
+                              ? NetworkImage(_userDetails['profilePhoto']!)
+                                  as ImageProvider
+                              : AssetImage(
+                                  'public/assets/images/nylo_logo.png'),
                         ),
                       ),
                       Column(
@@ -140,14 +139,14 @@ class _TabsPageState extends NyState<TabsPage> {
                                 fontWeight: FontWeight.w500, fontSize: 15),
                           ),
                           Text(
-                            _userDetails['jobTitle'],
+                            _userDetails['jobTitle'] ?? "",
                             style: TextStyle(
                                 fontWeight: FontWeight.w300, fontSize: 12),
                           ),
                           Text(
-                            _userDetails['availableCardSlots'].toString() +
+                            '${_userDetails['availableCardSlots'] ?? 0}' +
                                 "/" +
-                                _userDetails['cardSlots'].toString(),
+                                '${_userDetails['cardSlots'] ?? 0}',
                           ),
                         ],
                       )
@@ -194,7 +193,8 @@ class _TabsPageState extends NyState<TabsPage> {
         bottomNavigationBar:
             _userDetails['monthlySubscriptionStatus'] == 'active' ||
                     _userDetails['monthlySubscriptionStatus'] == 'trialing' ||
-                    _userDetails['monthlySubscriptionStatus'] == 'success'
+                    _userDetails['monthlySubscriptionStatus'] == 'success' ||
+                    _userDetails['monthlySubscriptionStatus'] == 'succeeded'
                 ? DotNavigationBar(
                     borderRadius: 50,
                     enableFloatingNavBar: true,

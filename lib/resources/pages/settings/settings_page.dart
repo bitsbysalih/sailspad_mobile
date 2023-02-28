@@ -5,7 +5,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nylo_framework/nylo_framework.dart';
-import 'package:sailspad/resources/pages/sign_in_page.dart';
 import 'package:sailspad/resources/widgets/auth_form_field.dart';
 import 'package:sailspad/resources/widgets/rounded_button.dart';
 
@@ -111,6 +110,7 @@ class _SettingsPageState extends NyState<SettingsPage> {
             initialValue: _userDetails['firstName'],
             onChanged: (value) {
               _userDetails['firstName'] = value;
+              return null;
             },
           ),
           AuthFormField(
@@ -118,6 +118,7 @@ class _SettingsPageState extends NyState<SettingsPage> {
             initialValue: _userDetails['lastName'],
             onChanged: (value) {
               _userDetails['lastName'] = value;
+              return null;
             },
           ),
           AuthFormField(
@@ -125,6 +126,7 @@ class _SettingsPageState extends NyState<SettingsPage> {
             initialValue: _userDetails['jobTitle'],
             onChanged: (value) {
               _userDetails['jobTitle'] = value;
+              return null;
             },
           ),
           RoundedButton(
@@ -225,9 +227,9 @@ class _SettingsPageState extends NyState<SettingsPage> {
                     ),
                   ),
                   Text(
-                    _userDetails['firstName'] +
-                        "\n " +
-                        _userDetails['lastName'],
+                    _userDetails['firstName'] ??
+                        "" + "\n " + _userDetails['lastName'] ??
+                        "",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 35,
@@ -235,7 +237,7 @@ class _SettingsPageState extends NyState<SettingsPage> {
                     ),
                   ),
                   Text(
-                    _userDetails['jobTitle'],
+                    _userDetails['jobTitle'] ?? '',
                     style: TextStyle(fontSize: 10),
                   ),
                 ],

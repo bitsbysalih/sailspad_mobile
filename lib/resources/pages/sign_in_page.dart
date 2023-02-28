@@ -97,6 +97,7 @@ class _SignInPageState extends NyState<SignInPage> {
                         textInputType: TextInputType.text,
                         onChanged: (value) {
                           _signInData['email'] = value;
+                          return null;
                         },
                       ),
                       AuthFormField(
@@ -105,6 +106,7 @@ class _SignInPageState extends NyState<SignInPage> {
                         obscureText: true,
                         onChanged: (value) {
                           _signInData['password'] = value;
+                          return null;
                         },
                       ),
                       SizedBox(

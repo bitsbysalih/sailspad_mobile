@@ -14,7 +14,6 @@ class AnalyticsPage extends NyStatefulWidget {
 }
 
 class _AnalyticsPageState extends NyState<AnalyticsPage> {
-  bool _isLoading = false;
   List loadedCards = [];
 
   @override
@@ -28,9 +27,7 @@ class _AnalyticsPageState extends NyState<AnalyticsPage> {
   }
 
   Future<void> loadCards() async {
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() {});
     final response = await api<ArCardApiService>(
       (request) => request.fetchAll(),
     );
@@ -39,9 +36,7 @@ class _AnalyticsPageState extends NyState<AnalyticsPage> {
         loadedCards = response;
       });
     }
-    setState(() {
-      _isLoading = false;
-    });
+    setState(() {});
   }
 
   @override
